@@ -1,6 +1,5 @@
 package dev.fadisarwat.bookstore.dao;
 
-import dev.fadisarwat.bookstore.models.OauthToken;
 import dev.fadisarwat.bookstore.models.User;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -11,46 +10,51 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public class OauthTokenDAOImpl implements OauthTokenDAO {
+public class UserDAOImpl implements UserDAO {
 
     @Autowired
     private SessionFactory sessionFactory;
 
     @Override
-    public OauthToken createToken(User user) {
+    public void saveUser(User user) {
         Session session = sessionFactory.getCurrentSession();
 
-        OauthToken oauthToken = new OauthToken(user);
-
-        session.merge(oauthToken);
-
-        return oauthToken;
+        session.merge(user);
     }
 
     @Override
-    public OauthToken getToken(String token) {
+    public User getUser(String email) {
         Session session = sessionFactory.getCurrentSession();
 
-        return session.find(OauthToken.class, token);
+        Query query = session.createQuery("from User where email=:email");
+
+        query.setParameter("email", email);
+
+        return (User) query.getSingleResult();
     }
 
     @Override
-    public void deleteToken(String token) {
+    public User getUser(Long id) {
         Session session = sessionFactory.getCurrentSession();
 
-        Query query = session.createQuery("delete from OauthToken where id=:token");
+        return session.find(User.class, id);
+    }
 
-        query.setParameter("token", token);
+    @Override
+    public void deleteUser(Long id) {
+        Session session = sessionFactory.getCurrentSession();
+
+        Query query = session.createQuery("delete from User where id=:id");
+
+        query.setParameter("id", id);
 
         query.executeUpdate();
     }
 
-    public List<String> getAuthorities(OauthToken oauthToken) {
+    public List<User> getUsers() {
         Session session = sessionFactory.getCurrentSession();
 
-        Query query = session.createNativeQuery("select authority from authorities where user_id=:id");
-
-        query.setParameter("id", oauthToken.getUser().getId());
+        Query query = session.createQuery("from User");
 
         return query.getResultList();
     }

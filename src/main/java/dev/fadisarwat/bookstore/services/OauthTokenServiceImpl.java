@@ -2,8 +2,11 @@ package dev.fadisarwat.bookstore.services;
 
 import dev.fadisarwat.bookstore.dao.OauthTokenDAO;
 import dev.fadisarwat.bookstore.models.OauthToken;
+import dev.fadisarwat.bookstore.models.User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 public class OauthTokenServiceImpl implements OauthTokenService {
@@ -16,8 +19,8 @@ public class OauthTokenServiceImpl implements OauthTokenService {
 
     @Override
     @Transactional
-    public void saveToken(OauthToken oauthToken) {
-        tokenDAO.saveToken(oauthToken);
+    public OauthToken createToken(User user) {
+        return tokenDAO.createToken(user);
     }
 
     @Override
@@ -30,5 +33,11 @@ public class OauthTokenServiceImpl implements OauthTokenService {
     @Transactional
     public void deleteToken(String token) {
         tokenDAO.deleteToken(token);
+    }
+
+    @Override
+    @Transactional
+    public List<String> getAuthorities(OauthToken oauthToken) {
+        return tokenDAO.getAuthorities(oauthToken);
     }
 }

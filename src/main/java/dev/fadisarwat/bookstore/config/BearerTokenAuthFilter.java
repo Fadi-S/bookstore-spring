@@ -15,6 +15,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.List;
 
 @Component
 public class BearerTokenAuthFilter extends OncePerRequestFilter {
@@ -28,15 +29,21 @@ public class BearerTokenAuthFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         String authHeader = request.getHeader("Authorization");
         if (authHeader == null || !authHeader.startsWith("Bearer ") || authHeader.substring(7).isBlank()) {
-            throw new AuthenticationFailedException("Token required");
+            filterChain.doFilter(request, response);
+            return;
         }
+
         String token = authHeader.substring(7);
         User user = getUserFromToken(token);
         if(user == null) {
             throw new AuthenticationFailedException("Invalid token");
         }
         Authentication authenticationToken =
-                new UsernamePasswordAuthenticationToken(user.getId(), null, user.getAuthorities());
+                new UsernamePasswordAuthenticationToken(
+                        user,
+                        null,
+                        user.getAuthorities()
+                );
 
         SecurityContextHolder.getContext().setAuthentication(authenticationToken);
 
@@ -45,16 +52,13 @@ public class BearerTokenAuthFilter extends OncePerRequestFilter {
 
     private User getUserFromToken(String token) {
         OauthToken oauthToken = this.oauthTokenService.getToken(token);
-
         if (oauthToken == null) {
             return null;
         }
+        List<String> authorities = this.oauthTokenService.getAuthorities(oauthToken);
+        User user = oauthToken.getUser();
+        user.setAuthorities(authorities);
 
-        return oauthToken.getUser();
-    }
-
-    private void writeResponse(HttpServletResponse response, String message) throws IOException {
-        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-        response.getWriter().write(message);
+        return user;
     }
 }
