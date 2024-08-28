@@ -1,5 +1,7 @@
 package dev.fadisarwat.bookstore.config;
 
+import dev.fadisarwat.bookstore.exceptions.ExceptionHandlerFilter;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.Customizer;
@@ -9,7 +11,9 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.provisioning.JdbcUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
 import javax.sql.DataSource;
 import java.util.Collections;
@@ -17,32 +21,19 @@ import java.util.Collections;
 @Configuration
 public class SecurityConfig {
 
+    @Autowired
+    BearerTokenAuthFilter bearerTokenAuthFilter;
+
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        ApiKeyAuthFilter filter = new ApiKeyAuthFilter(new AntPathRequestMatcher("/api/**"));
-        filter.setAuthenticationManager(authentication -> {
-            String apiKey = (String) authentication.getPrincipal();
-            String apiSecret = (String) authentication.getCredentials();
-
-            if ("valid-api-key".equals(apiKey) && "valid-api-secret".equals(apiSecret)) {
-                return new ApiKeyAuthenticationToken(apiKey, apiSecret, Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER")));
-            } else {
-                authentication.setAuthenticated(false);
-            }
-
-            return authentication;
-        });
-
-
         http
+                .authorizeHttpRequests(request -> {
+                    request.requestMatchers("/api/register", "/api/login").permitAll();
+                    request.requestMatchers("/api/**").authenticated();
+                })
                 .csrf(AbstractHttpConfigurer::disable)
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/**").authenticated()
-                        .anyRequest().permitAll()
-                )
-                .addFilterBefore(filter, UsernamePasswordAuthenticationFilter.class)
-        ;
-
+                .addFilterAfter(bearerTokenAuthFilter, BasicAuthenticationFilter.class)
+                .addFilterBefore(new ExceptionHandlerFilter(), BasicAuthenticationFilter.class);
         return http.build();
     }
 

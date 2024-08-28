@@ -3,6 +3,7 @@ package dev.fadisarwat.bookstore.config;
 import com.mchange.v2.c3p0.ComboPooledDataSource;
 import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.FactoryBean;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
@@ -11,17 +12,21 @@ import org.springframework.orm.hibernate5.LocalSessionFactoryBean;
 import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.transaction.support.ResourceTransactionManager;
+import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import javax.sql.DataSource;
 import java.util.Objects;
 import java.util.Properties;
 import java.util.function.Function;
+import java.util.logging.Logger;
 
 @Configuration
 @EnableTransactionManagement
 @PropertySource("classpath:persistence-mysql.properties")
 public class MvcConfig implements WebMvcConfigurer {
+
+    private Logger logger = Logger.getLogger(getClass().getName());
 
     @Bean
     public DataSource getDataSource(Environment env) {
@@ -58,7 +63,7 @@ public class MvcConfig implements WebMvcConfigurer {
         LocalSessionFactoryBean factoryBean = new LocalSessionFactoryBean();
 
         factoryBean.setDataSource(getDataSource(environment));
-        factoryBean.setPackagesToScan("dev.fadisarwat.blog.models");
+        factoryBean.setPackagesToScan("dev.fadisarwat.bookstore.models");
 
         Properties props = new Properties();
         props.setProperty("hibernate.show_sql", "true");
