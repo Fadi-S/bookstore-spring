@@ -1,11 +1,19 @@
 package dev.fadisarwat.bookstore.models;
 
+import dev.fadisarwat.bookstore.annotations.Unique;
 import jakarta.persistence.*;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
+import org.hibernate.validator.constraints.UniqueElements;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Entity
 @Table(name = "user")
@@ -26,19 +34,31 @@ public class User {
     private Long id;
 
     @Column(name = "first_name")
+    @NotNull(message="is required")
+    @Size(min=1, message="is required")
     private String firstName;
 
     @Column(name = "last_name")
+    @NotNull(message="is required")
+    @Size(min=1, message="is required")
     private String lastName;
 
     @Column(name = "email", unique=true)
+    @NotNull(message="is required")
+    @Size(min=1, message="is required")
+    @Email
+//    @Unique(value="email", table="User")
     private String email;
 
     @Column(name = "password")
+    @NotNull(message="is required")
+    @Size(min=1, message="is required")
     private String password;
 
     @ElementCollection
-    private List<SimpleGrantedAuthority> authorities;
+    @CollectionTable(name = "authorities", joinColumns = @JoinColumn(name = "user_id"))
+    @Column(name = "authority")
+    private List<String> authorities;
 
     public void setId(Long id) {
         this.id = id;
@@ -49,14 +69,35 @@ public class User {
     }
 
     public List<SimpleGrantedAuthority> getAuthorities() {
+        List<SimpleGrantedAuthority> authorities = new ArrayList<>();
+        for (String authority : this.authorities) {
+            authorities.add(new SimpleGrantedAuthority("ROLE_" + authority));
+        }
+        return authorities;
+    }
+
+    public List<String> getAuthoritiesString() {
         return this.authorities;
     }
 
+    public Map<String, Object> get() {
+        HashMap<String, Object> json = new HashMap<>();
+        json.put("firstName", this.firstName);
+        json.put("lastName", this.lastName);
+        json.put("email", this.email);
+        return json;
+    }
+
     public void setAuthorities(List<String> authorities) {
-        this.authorities = new ArrayList<>();
-        for (String authority : authorities) {
-            this.authorities.add(new SimpleGrantedAuthority("ROLE_" + authority));
+        this.authorities = authorities;
+    }
+
+    public void addAuthority(String authority) {
+        if (this.authorities == null) {
+            this.authorities = new ArrayList<>();
         }
+
+        this.authorities.add(authority);
     }
 
     public String getFirstName() {

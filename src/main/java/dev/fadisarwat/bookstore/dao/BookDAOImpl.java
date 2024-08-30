@@ -1,5 +1,6 @@
 package dev.fadisarwat.bookstore.dao;
 
+import dev.fadisarwat.bookstore.models.Book;
 import dev.fadisarwat.bookstore.models.User;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -10,51 +11,40 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public class UserDAOImpl implements UserDAO {
+public class BookDAOImpl implements BookDAO {
 
     @Autowired
     private SessionFactory sessionFactory;
 
     @Override
-    public void saveUser(User user) {
+    public void saveBook(Book book) {
         Session session = sessionFactory.getCurrentSession();
 
-        session.merge(user);
+        session.merge(book);
     }
 
     @Override
-    public User getUser(String email) {
+    public Book getBook(Long id) {
         Session session = sessionFactory.getCurrentSession();
 
-        Query query = session.createQuery("from User where email=:email");
-
-        query.setParameter("email", email);
-
-        return (User) query.getResultList().stream().findFirst().orElse(null);
+        return session.find(Book.class, id);
     }
 
     @Override
-    public User getUser(Long id) {
+    public void deleteBook(Long id) {
         Session session = sessionFactory.getCurrentSession();
 
-        return session.find(User.class, id);
-    }
-
-    @Override
-    public void deleteUser(Long id) {
-        Session session = sessionFactory.getCurrentSession();
-
-        Query query = session.createQuery("delete from User where id=:id");
+        Query query = session.createQuery("delete from Book where id=:id");
 
         query.setParameter("id", id);
 
         query.executeUpdate();
     }
 
-    public List<User> getUsers() {
+    public List<Book> getBooks() {
         Session session = sessionFactory.getCurrentSession();
 
-        Query query = session.createQuery("from User");
+        Query query = session.createQuery("from Book");
 
         return query.getResultList();
     }

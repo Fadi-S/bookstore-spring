@@ -5,11 +5,15 @@ import dev.fadisarwat.bookstore.models.OauthToken;
 import dev.fadisarwat.bookstore.models.User;
 import dev.fadisarwat.bookstore.services.OauthTokenService;
 import dev.fadisarwat.bookstore.services.UserService;
+import org.json.JSONObject;
 import org.springframework.beans.propertyeditors.StringTrimmerEditor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.acls.model.NotFoundException;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api")
@@ -31,7 +35,10 @@ public class AuthenticationController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<JsonResponse> login(@RequestParam String email, @RequestParam String password) {
+    public Map<String, Object> login(
+            @RequestParam(required = false) String email,
+            @RequestParam(required = false) String password
+    ) {
         User user = this.userService.getUser(email);
         if (user == null || !user.matchPassword(password)) {
             throw new NotFoundException("Credentials doesn't match any user");
@@ -40,26 +47,35 @@ public class AuthenticationController {
         JsonResponse response = new JsonResponse();
         String token = this.oauthTokenService.createToken(user).getToken();
 
-        response.setMessage(token);
+        JSONObject json = new JSONObject();
+        json.put("token", token);
+        json.put("authorities", user.getAuthoritiesString());
+        json.put("user", user.get());
+        response.setMessage(json);
 
-        return response.get();
+        return json.toMap();
     }
 
     @PostMapping("/register")
-    public ResponseEntity<JsonResponse> register(
-            @RequestParam(name="first_name") String firstName,
-            @RequestParam(name="last_name") String lastName,
-            @RequestParam String email,
-            @RequestParam String password
-            ) {
+    public Map<String, Object> register(@RequestBody User user) {
+        if(this.userService.getUser(user.getEmail()) != null) {
+            JsonResponse response = new JsonResponse();
+            response.setStatus(400);
+            response.setMessage(
+                    new JSONObject()
+                            .put(
+                                    "errors",
+                                    new JSONObject().put("email", "User already exists")
+                            )
+            );
 
-        JsonResponse response = new JsonResponse();
+            return response.toMap();
+        }
 
-        User user = new User(firstName, lastName, email, password);
-        OauthToken token = this.oauthTokenService.createToken(user);
-
-        response.setMessage(token.getToken());
-
-        return response.get();
+        return new JSONObject()
+                .put("token", this.oauthTokenService.createToken(user).getToken())
+                .put("user", user.get())
+                .put("authorities", user.getAuthoritiesString())
+                .toMap();
     }
 }

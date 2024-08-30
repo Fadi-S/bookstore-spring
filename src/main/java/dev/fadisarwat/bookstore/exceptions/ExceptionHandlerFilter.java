@@ -8,10 +8,10 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.Arrays;
 
 public class ExceptionHandlerFilter extends OncePerRequestFilter {
     @Override
@@ -19,11 +19,13 @@ public class ExceptionHandlerFilter extends OncePerRequestFilter {
         try {
             filterChain.doFilter(request, response);
         } catch (Exception e) {
-            RestExceptionHandler handler = new RestExceptionHandler();
-            JsonResponse jsonResponse = handler.handleException(e).getBody();
-
-            response.setStatus(jsonResponse.getStatus());
-            response.getWriter().write(convertObjectToJson(jsonResponse));
+//            RestExceptionHandler handler = new RestExceptionHandler();
+//            JsonResponse jsonResponse = handler.handleException(e).getBody();
+//
+//            response.setStatus(jsonResponse.getStatus());
+//            response.getWriter().write(convertObjectToJson(jsonResponse));
+            response.getWriter().write(e.getMessage());
+            response.getWriter().write(Arrays.toString(e.getStackTrace()));
             response.setContentType("application/json");
         }
     }
