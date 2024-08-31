@@ -65,6 +65,16 @@ public class JsonResponse {
         this.messageJson = message;
     }
 
+    public void setErrors(JSONObject errors) {
+        if (this.messageJson == null) {
+            this.messageJson = new JSONObject();
+        }
+
+        this.messageJson.put("errors", errors);
+
+        this.setStatus(400);
+    }
+
     public long getTimestamp() {
         return timestamp;
     }

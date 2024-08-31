@@ -1,15 +1,12 @@
 package dev.fadisarwat.bookstore.controllers;
 
+import dev.fadisarwat.bookstore.exceptions.AuthenticationFailedException;
 import dev.fadisarwat.bookstore.json.JsonResponse;
-import dev.fadisarwat.bookstore.models.OauthToken;
 import dev.fadisarwat.bookstore.models.User;
 import dev.fadisarwat.bookstore.services.OauthTokenService;
 import dev.fadisarwat.bookstore.services.UserService;
 import org.json.JSONObject;
 import org.springframework.beans.propertyeditors.StringTrimmerEditor;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.acls.model.NotFoundException;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 
@@ -41,7 +38,7 @@ public class AuthenticationController {
     ) {
         User user = this.userService.getUser(email);
         if (user == null || !user.matchPassword(password)) {
-            throw new NotFoundException("Credentials doesn't match any user");
+            throw new AuthenticationFailedException("Credentials doesn't match any user");
         }
 
         JsonResponse response = new JsonResponse();
@@ -60,14 +57,7 @@ public class AuthenticationController {
     public Map<String, Object> register(@RequestBody User user) {
         if(this.userService.getUser(user.getEmail()) != null) {
             JsonResponse response = new JsonResponse();
-            response.setStatus(400);
-            response.setMessage(
-                    new JSONObject()
-                            .put(
-                                    "errors",
-                                    new JSONObject().put("email", "User already exists")
-                            )
-            );
+            response.setErrors(new JSONObject().put("email", "User already exists"));
 
             return response.toMap();
         }
