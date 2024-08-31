@@ -18,11 +18,17 @@ import java.util.Arrays;
 @ControllerAdvice
 public class RestExceptionHandler {
 
-    private Boolean debug = true;
+    private final Boolean debug = false;
 
     @ExceptionHandler
     public ResponseEntity<JsonResponse> handleException(AuthenticationFailedException e) {
         return defaultResponse(HttpStatus.UNAUTHORIZED, e);
+    }
+
+
+    @ExceptionHandler
+    public ResponseEntity<JsonResponse> handleException(IllegalArgumentException e) {
+        return defaultResponse(HttpStatus.BAD_REQUEST, e);
     }
 
     @ExceptionHandler

@@ -1,5 +1,7 @@
 package dev.fadisarwat.bookstore.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.persistence.*;
 
 import java.util.ArrayList;
@@ -29,7 +31,7 @@ public class Book {
     @Column
     private Long quantity;
 
-    @OneToMany(mappedBy="book", fetch=FetchType.LAZY)
+    @OneToMany(mappedBy="book", fetch=FetchType.LAZY, cascade = CascadeType.ALL)
     private List<Review> reviews;
 
     public void setId(Long id) {

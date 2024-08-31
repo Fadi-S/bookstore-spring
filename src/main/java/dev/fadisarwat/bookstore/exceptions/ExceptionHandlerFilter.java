@@ -24,8 +24,7 @@ public class ExceptionHandlerFilter extends OncePerRequestFilter {
 //
 //            response.setStatus(jsonResponse.getStatus());
 //            response.getWriter().write(convertObjectToJson(jsonResponse));
-            response.getWriter().write(e.getMessage());
-            response.getWriter().write(Arrays.toString(e.getStackTrace()));
+            e.printStackTrace();
             response.setContentType("application/json");
         }
     }
