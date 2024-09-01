@@ -6,6 +6,14 @@ import jakarta.persistence.*;
 @Table(name="shopping_cart_item")
 public class ShoppingCartItem {
 
+    public ShoppingCartItem() {}
+
+    public ShoppingCartItem(Book book, User user, Long quantity) {
+        this.book = book;
+        this.user = user;
+        this.quantity = quantity;
+    }
+
     @Id
     @Column
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -35,6 +43,14 @@ public class ShoppingCartItem {
 
     public void setQuantity(Long quantity) {
         this.quantity = quantity;
+    }
+
+    public void incrementQuantity() {
+        this.quantity++;
+    }
+
+    public void decrementQuantity() {
+        this.quantity--;
     }
 
     public User getUser() {

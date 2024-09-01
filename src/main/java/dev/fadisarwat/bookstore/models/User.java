@@ -8,7 +8,9 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import org.hibernate.validator.constraints.UniqueElements;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -26,6 +28,10 @@ public class User {
         this.lastName = lastName;
         this.email = email;
         this.setPassword(password);
+    }
+
+    public static User getCurrentUser() {
+        return (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     }
 
     @Id
@@ -60,7 +66,7 @@ public class User {
     @Column(name = "authority")
     private List<String> authorities;
 
-    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, mappedBy = "user")
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "user")
     private List<ShoppingCartItem> booksInCart;
 
     public void setId(Long id) {
@@ -145,5 +151,21 @@ public class User {
 
     public void setBooksInCart(List<ShoppingCartItem> booksInCart) {
         this.booksInCart = booksInCart;
+    }
+
+    public void addBookToCart(ShoppingCartItem book) {
+        if (this.booksInCart == null) {
+            this.booksInCart = new ArrayList<>();
+        }
+
+        // Check if the book is already in the cart
+        for (ShoppingCartItem item : this.booksInCart) {
+            if (item.getBook().getId().equals(book.getBook().getId())) {
+                item.setQuantity(item.getQuantity() + 1);
+                return;
+            }
+        }
+
+        this.booksInCart.add(book);
     }
 }

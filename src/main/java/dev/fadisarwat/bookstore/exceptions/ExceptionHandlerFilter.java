@@ -18,14 +18,15 @@ public class ExceptionHandlerFilter extends OncePerRequestFilter {
     public void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         try {
             filterChain.doFilter(request, response);
-        } catch (Exception e) {
-//            RestExceptionHandler handler = new RestExceptionHandler();
-//            JsonResponse jsonResponse = handler.handleException(e).getBody();
-//
-//            response.setStatus(jsonResponse.getStatus());
-//            response.getWriter().write(convertObjectToJson(jsonResponse));
-            e.printStackTrace();
+        } catch (AuthenticationFailedException e) {
+            RestExceptionHandler handler = new RestExceptionHandler();
+            JsonResponse jsonResponse = handler.handleException(e).getBody();
+
+            response.setStatus(jsonResponse.getStatus());
+            response.getWriter().write(convertObjectToJson(jsonResponse));
             response.setContentType("application/json");
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 

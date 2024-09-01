@@ -2,6 +2,7 @@ package dev.fadisarwat.bookstore.services;
 
 import dev.fadisarwat.bookstore.dao.UserDAO;
 import dev.fadisarwat.bookstore.models.User;
+import org.hibernate.Hibernate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -44,5 +45,15 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public List<User> getUsers() {
         return userDAO.getUsers();
+    }
+
+    @Override
+    @Transactional
+    public User loadUserCart(User user) {
+        user = userDAO.getUser(user.getId());
+
+        Hibernate.initialize(user.getBooksInCart());
+
+        return user;
     }
 }

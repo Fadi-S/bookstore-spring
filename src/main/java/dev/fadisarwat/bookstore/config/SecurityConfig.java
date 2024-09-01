@@ -29,12 +29,13 @@ public class SecurityConfig {
         http
                 .authorizeHttpRequests(request -> {
                     request.requestMatchers("/api/register", "/api/login").permitAll();
+                    request.requestMatchers("/api/books").hasAuthority("ROLE_ADMIN");
                     request.requestMatchers("/api/**").authenticated();
-                    request.requestMatchers("/api/books").hasAuthority("ADMIN");
                 })
                 .csrf(AbstractHttpConfigurer::disable)
                 .addFilterAfter(bearerTokenAuthFilter, BasicAuthenticationFilter.class)
-                .addFilterBefore(new ExceptionHandlerFilter(), BasicAuthenticationFilter.class);
+                .addFilterBefore(new ExceptionHandlerFilter(), BasicAuthenticationFilter.class)
+        ;
         return http.build();
     }
 

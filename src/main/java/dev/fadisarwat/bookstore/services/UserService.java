@@ -10,4 +10,5 @@ public interface UserService {
     User getUser(Long id);
     User getUser(String email);
     void deleteUser(Long id);
+    User loadUserCart(User user);
 }
