@@ -191,4 +191,22 @@ public class User {
             this.booksInCart.remove(item);
         }
     }
+
+    public List<Address> getAddresses() {
+        return addresses;
+    }
+
+    public void setAddresses(List<Address> addresses) {
+        this.addresses = addresses;
+    }
+
+    public void addAddress(Address address) {
+        if (this.addresses == null) {
+            this.addresses = new ArrayList<>();
+        }
+
+        address.setUser(this);
+
+        this.addresses.add(address);
+    }
 }

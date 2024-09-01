@@ -56,4 +56,14 @@ public class UserServiceImpl implements UserService {
 
         return user;
     }
+
+    @Override
+    @Transactional
+    public User loadAddresses(User user) {
+        user = userDAO.getUser(user.getId());
+
+        Hibernate.initialize(user.getAddresses());
+
+        return user;
+    }
 }

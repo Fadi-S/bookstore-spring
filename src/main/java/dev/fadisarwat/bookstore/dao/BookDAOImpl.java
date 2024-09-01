@@ -5,6 +5,7 @@ import dev.fadisarwat.bookstore.helpers.Sort;
 import dev.fadisarwat.bookstore.models.Book;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.query.MutationQuery;
 import org.hibernate.query.Query;
 import org.springframework.stereotype.Repository;
 
@@ -38,7 +39,7 @@ public class BookDAOImpl implements BookDAO {
     public void deleteBook(Long id) {
         Session session = sessionFactory.getCurrentSession();
 
-        Query<Book> query = session.createQuery("delete from Book where id=:id", Book.class);
+        MutationQuery query = session.createMutationQuery("delete from Book where id=:id");
 
         query.setParameter("id", id);
 

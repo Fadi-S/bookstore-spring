@@ -3,6 +3,7 @@ package dev.fadisarwat.bookstore.dao;
 import dev.fadisarwat.bookstore.models.User;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.query.MutationQuery;
 import org.hibernate.query.Query;
 import org.springframework.stereotype.Repository;
 
@@ -46,7 +47,7 @@ public class UserDAOImpl implements UserDAO {
     public void deleteUser(Long id) {
         Session session = sessionFactory.getCurrentSession();
 
-        Query<User> query = session.createQuery("delete from User where id=:id", User.class);
+        MutationQuery query = session.createMutationQuery("delete from User where id=:id");
 
         query.setParameter("id", id);
 

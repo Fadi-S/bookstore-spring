@@ -1,7 +1,10 @@
 package dev.fadisarwat.bookstore.models;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
 @Entity
 @Table(name="address")
@@ -12,7 +15,7 @@ public class Address {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
 
@@ -22,6 +25,7 @@ public class Address {
 
     @Column
     @NotNull(message="is required")
+    @Size(min = 2, max = 2, message = "must be 2 characters")
     private String country;
 
     @Column(name="address1")
@@ -48,6 +52,15 @@ public class Address {
         this.street2 = street2;
         this.city = city;
         this.postalCode = postalCode;
+    }
+
+    public void setFromAddress(Address address) {
+        this.fullName = address.getFullName();
+        this.country = address.getCountry();
+        this.street1 = address.getStreet1();
+        this.street2 = address.getStreet2();
+        this.city = address.getCity();
+        this.postalCode = address.getPostalCode();
     }
 
     public String getCity() {
@@ -108,5 +121,13 @@ public class Address {
 
     public String toString() {
         return fullName + "\n" + street1 + " " + street2 + "\n" + city + ", " + postalCode + "\n" + country;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
     }
 }

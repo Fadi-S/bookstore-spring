@@ -4,6 +4,7 @@ import dev.fadisarwat.bookstore.models.OauthToken;
 import dev.fadisarwat.bookstore.models.User;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.query.MutationQuery;
 import org.hibernate.query.Query;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -13,8 +14,10 @@ import java.util.List;
 @Repository
 public class OauthTokenDAOImpl implements OauthTokenDAO {
 
-    @Autowired
-    private SessionFactory sessionFactory;
+    private final SessionFactory sessionFactory;
+    OauthTokenDAOImpl(SessionFactory sessionFactory) {
+        this.sessionFactory = sessionFactory;
+    }
 
     @Override
     public OauthToken createToken(User user) {
@@ -38,7 +41,7 @@ public class OauthTokenDAOImpl implements OauthTokenDAO {
     public void deleteToken(String token) {
         Session session = sessionFactory.getCurrentSession();
 
-        Query query = session.createQuery("delete from OauthToken where id=:token");
+        MutationQuery query = session.createMutationQuery("delete from OauthToken where id=:token");
 
         query.setParameter("token", token);
 

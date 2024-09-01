@@ -11,4 +11,5 @@ public interface UserService {
     User getUser(String email);
     void deleteUser(Long id);
     User loadUserCart(User user);
+    User loadAddresses(User user);
 }
