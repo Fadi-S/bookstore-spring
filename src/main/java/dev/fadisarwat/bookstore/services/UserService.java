@@ -12,4 +12,5 @@ public interface UserService {
     void deleteUser(Long id);
     User loadUserCart(User user);
     User loadAddresses(User user);
+    User loadAll(User user);
 }

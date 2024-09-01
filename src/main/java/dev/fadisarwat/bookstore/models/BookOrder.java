@@ -21,6 +21,14 @@ public class BookOrder {
     @Column
     private Long quantity;
 
+    public BookOrder() {}
+
+    public BookOrder(Book book, Order order, Long quantity) {
+        this.book = book;
+        this.order = order;
+        this.quantity = quantity;
+    }
+
     public void setId(Long id) {
         this.id = id;
     }
