@@ -4,7 +4,6 @@ import dev.fadisarwat.bookstore.models.User;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.query.Query;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -12,8 +11,11 @@ import java.util.List;
 @Repository
 public class UserDAOImpl implements UserDAO {
 
-    @Autowired
-    private SessionFactory sessionFactory;
+    private final SessionFactory sessionFactory;
+
+    UserDAOImpl(SessionFactory sessionFactory) {
+        this.sessionFactory = sessionFactory;
+    }
 
     @Override
     public void saveUser(User user) {
@@ -26,11 +28,11 @@ public class UserDAOImpl implements UserDAO {
     public User getUser(String email) {
         Session session = sessionFactory.getCurrentSession();
 
-        Query query = session.createQuery("from User where email=:email");
+        Query<User> query = session.createQuery("from User where email=:email", User.class);
 
         query.setParameter("email", email);
 
-        return (User) query.getResultList().stream().findFirst().orElse(null);
+        return query.getResultList().stream().findFirst().orElse(null);
     }
 
     @Override
@@ -44,7 +46,7 @@ public class UserDAOImpl implements UserDAO {
     public void deleteUser(Long id) {
         Session session = sessionFactory.getCurrentSession();
 
-        Query query = session.createQuery("delete from User where id=:id");
+        Query<User> query = session.createQuery("delete from User where id=:id", User.class);
 
         query.setParameter("id", id);
 
@@ -54,7 +56,7 @@ public class UserDAOImpl implements UserDAO {
     public List<User> getUsers() {
         Session session = sessionFactory.getCurrentSession();
 
-        Query query = session.createQuery("from User");
+        Query<User> query = session.createQuery("from User", User.class);
 
         return query.getResultList();
     }

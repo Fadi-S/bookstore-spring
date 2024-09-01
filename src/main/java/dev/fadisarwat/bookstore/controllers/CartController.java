@@ -1,16 +1,11 @@
 package dev.fadisarwat.bookstore.controllers;
 
-
 import dev.fadisarwat.bookstore.dto.ShoppingCartItemDTO;
 import dev.fadisarwat.bookstore.models.Book;
-import dev.fadisarwat.bookstore.models.ShoppingCartItem;
 import dev.fadisarwat.bookstore.models.User;
 import dev.fadisarwat.bookstore.services.BookService;
 import dev.fadisarwat.bookstore.services.UserService;
-import org.hibernate.Hibernate;
-import org.hibernate.SessionFactory;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.transaction.annotation.Transactional;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -40,14 +35,26 @@ public class CartController {
     }
 
     @PostMapping("/cart/{bookId}/add")
-    public Map<String, Object> addToCart(@PathVariable String bookId) {
+    public Map<String, Object> addToCart(@PathVariable String bookId, HttpServletResponse response) {
         Book book = this.bookService.getBook(Long.parseLong(bookId));
         User user = this.userService.loadUserCart(User.getCurrentUser());
 
-        ShoppingCartItem item = new ShoppingCartItem(book, user, 1L);
-        user.addBookToCart(item);
+        Boolean success = user.addToCart(book);
         this.userService.saveUser(user);
 
-        return Map.of("success", true);
+        response.setStatus(success ? HttpServletResponse.SC_OK : HttpServletResponse.SC_BAD_REQUEST);
+
+        return Map.of("message", success ? "success" : "Book out of stock");
+    }
+
+    @PostMapping("/cart/{bookId}/remove")
+    public Map<String, Object> removeFromCart(@PathVariable String bookId) {
+        Book book = this.bookService.getBook(Long.parseLong(bookId));
+        User user = this.userService.loadUserCart(User.getCurrentUser());
+
+        user.removeFromCart(book);
+        this.userService.saveUser(user);
+
+        return Map.of("message", "success");
     }
 }

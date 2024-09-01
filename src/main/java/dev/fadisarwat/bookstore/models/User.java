@@ -1,27 +1,21 @@
 package dev.fadisarwat.bookstore.models;
 
-import dev.fadisarwat.bookstore.annotations.Unique;
 import jakarta.persistence.*;
-import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import org.hibernate.validator.constraints.UniqueElements;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Entity
 @Table(name = "user")
 public class User {
 
-    public User() {}
+    public User() {
+    }
 
     public User(String firstName, String lastName, String email, String password) {
         this.firstName = firstName;
@@ -40,25 +34,25 @@ public class User {
     private Long id;
 
     @Column(name = "first_name")
-    @NotNull(message="is required")
-    @Size(min=1, message="is required")
+    @NotNull(message = "is required")
+    @Size(min = 1, message = "is required")
     private String firstName;
 
     @Column(name = "last_name")
-    @NotNull(message="is required")
-    @Size(min=1, message="is required")
+    @NotNull(message = "is required")
+    @Size(min = 1, message = "is required")
     private String lastName;
 
-    @Column(name = "email", unique=true)
-    @NotNull(message="is required")
-    @Size(min=1, message="is required")
+    @Column(name = "email", unique = true)
+    @NotNull(message = "is required")
+    @Size(min = 1, message = "is required")
     @Email
 //    @Unique(value="email", table="User")
     private String email;
 
     @Column(name = "password")
-    @NotNull(message="is required")
-    @Size(min=1, message="is required")
+    @NotNull(message = "is required")
+    @Size(min = 1, message = "is required")
     private String password;
 
     @ElementCollection
@@ -66,7 +60,10 @@ public class User {
     @Column(name = "authority")
     private List<String> authorities;
 
-    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "user")
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "user", orphanRemoval = true)
+    private List<Address> addresses;
+
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "user", orphanRemoval = true)
     private List<ShoppingCartItem> booksInCart;
 
     public void setId(Long id) {
@@ -153,19 +150,45 @@ public class User {
         this.booksInCart = booksInCart;
     }
 
-    public void addBookToCart(ShoppingCartItem book) {
+    public Boolean addToCart(Book book) {
         if (this.booksInCart == null) {
             this.booksInCart = new ArrayList<>();
         }
 
-        // Check if the book is already in the cart
-        for (ShoppingCartItem item : this.booksInCart) {
-            if (item.getBook().getId().equals(book.getBook().getId())) {
-                item.setQuantity(item.getQuantity() + 1);
-                return;
-            }
+        if(book.getQuantity() == 0) {
+            return false;
         }
 
-        this.booksInCart.add(book);
+        this.booksInCart.stream()
+                .filter(item -> item.getBook().equals(book))
+                .findFirst()
+                .ifPresentOrElse(
+                        ShoppingCartItem::incrementQuantity,
+                        () -> this.booksInCart.add(new ShoppingCartItem(book, this, 1L))
+                );
+
+        return true;
+    }
+
+    public void removeFromCart(Book book) {
+        if (this.booksInCart == null) {
+            return;
+        }
+
+        ShoppingCartItem item = this.booksInCart
+                .stream()
+                .filter(i -> i.getBook().equals(book))
+                .findFirst()
+                .orElse(null);
+
+        if(item == null) {
+            return;
+        }
+
+        if(item.getQuantity() > 1) {
+            item.decrementQuantity();
+        } else {
+            this.booksInCart.remove(item);
+        }
     }
 }

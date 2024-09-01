@@ -97,4 +97,13 @@ public class Book {
 
         reviews.add(review);
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof Book) {
+            return ((Book) obj).getId().equals(this.id);
+        }
+
+        return super.equals(obj);
+    }
 }

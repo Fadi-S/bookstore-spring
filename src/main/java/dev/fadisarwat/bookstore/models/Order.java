@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 
+import java.util.List;
+
 @Entity
 @Table(name="order")
 public class Order {
@@ -49,6 +51,9 @@ public class Order {
     @Enumerated(EnumType.STRING)
     @NotNull(message="is required")
     private Status status;
+
+    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, mappedBy = "order", orphanRemoval = true)
+    private List<BookOrder> bookOrders;
 
 
     public void setId(Long id) {
