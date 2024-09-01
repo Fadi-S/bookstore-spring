@@ -3,7 +3,7 @@ package dev.fadisarwat.bookstore.services;
 import dev.fadisarwat.bookstore.helpers.Filter;
 import dev.fadisarwat.bookstore.helpers.Sort;
 import dev.fadisarwat.bookstore.models.Book;
-import dev.fadisarwat.bookstore.models.BookForListDTO;
+import dev.fadisarwat.bookstore.dto.BookForListDTO;
 
 import java.util.List;
 

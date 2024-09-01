@@ -4,7 +4,7 @@ import dev.fadisarwat.bookstore.helpers.Filter;
 import dev.fadisarwat.bookstore.helpers.FilterType;
 import dev.fadisarwat.bookstore.helpers.Sort;
 import dev.fadisarwat.bookstore.models.Book;
-import dev.fadisarwat.bookstore.models.BookForListDTO;
+import dev.fadisarwat.bookstore.dto.BookForListDTO;
 import dev.fadisarwat.bookstore.services.BookService;
 import org.springframework.web.bind.annotation.*;
 
@@ -73,14 +73,14 @@ public class BookController {
         return this.bookService.getBooks(filters, sort , page, size);
     }
 
-    @PostMapping
-    public void create(@ModelAttribute("book") Book book) {
-        this.bookService.saveBook(book);
-    }
-
     @GetMapping("/{id}")
     public Book show(@PathVariable Long id) {
         return this.bookService.getBook(id);
     }
 
+
+    @PostMapping
+    public void create(@ModelAttribute("book") Book book) {
+        this.bookService.saveBook(book);
+    }
 }

@@ -4,7 +4,7 @@ import dev.fadisarwat.bookstore.dao.BookDAO;
 import dev.fadisarwat.bookstore.helpers.Filter;
 import dev.fadisarwat.bookstore.helpers.Sort;
 import dev.fadisarwat.bookstore.models.Book;
-import dev.fadisarwat.bookstore.models.BookForListDTO;
+import dev.fadisarwat.bookstore.dto.BookForListDTO;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

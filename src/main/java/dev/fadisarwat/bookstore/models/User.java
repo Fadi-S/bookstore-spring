@@ -60,6 +60,9 @@ public class User {
     @Column(name = "authority")
     private List<String> authorities;
 
+    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, mappedBy = "user")
+    private List<ShoppingCartItem> booksInCart;
+
     public void setId(Long id) {
         this.id = id;
     }
@@ -134,5 +137,13 @@ public class User {
 
     public Boolean matchPassword(String password) {
         return new BCryptPasswordEncoder().matches(password, this.getPassword());
+    }
+
+    public List<ShoppingCartItem> getBooksInCart() {
+        return booksInCart;
+    }
+
+    public void setBooksInCart(List<ShoppingCartItem> booksInCart) {
+        this.booksInCart = booksInCart;
     }
 }
