@@ -54,6 +54,17 @@ public class UserDAOImpl implements UserDAO {
         query.executeUpdate();
     }
 
+    @Override
+    public void emptyCart(User user) {
+        Session session = sessionFactory.getCurrentSession();
+
+        MutationQuery query = session.createNativeMutationQuery("delete from shopping_cart_item where user_id=:id");
+
+        query.setParameter("id", user.getId());
+
+        query.executeUpdate();
+    }
+
     public List<User> getUsers() {
         Session session = sessionFactory.getCurrentSession();
 

@@ -1,5 +1,6 @@
 package dev.fadisarwat.bookstore.models;
 
+import dev.fadisarwat.bookstore.dto.ShoppingCartItemDTO;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
@@ -106,6 +107,13 @@ public class User {
         this.authorities.add(authority);
     }
 
+    public Long cartTotalPriceInPennies() {
+        return booksInCart
+                .stream()
+                .map(ShoppingCartItemDTO::fromShoppingCartItem)
+                .reduce(0L, (acc, item) -> acc + item.totalPriceInPennies(), Long::sum);
+    }
+
     public String getFirstName() {
         return firstName;
     }
@@ -193,7 +201,7 @@ public class User {
     }
 
     public void emptyCart() {
-        this.booksInCart.removeIf(_ -> true);
+        this.booksInCart.removeIf(i -> true);
     }
 
     public List<Address> getAddresses() {

@@ -9,4 +9,5 @@ public interface UserDAO {
     User getUser(Long id);
     User getUser(String email);
     void deleteUser(Long id);
+    void emptyCart(User user);
 }

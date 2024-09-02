@@ -11,6 +11,7 @@ public interface BookService {
     void saveBook(Book book);
     Book getBook(Long id);
     void deleteBook(Long id);
+    void saveBooks(List<Book> books);
     List<BookForListDTO> getBooks(List<Filter> filters, Sort sort, int page, int size);
     List<BookForListDTO> getBooks(List<Filter> filters, Sort sort);
     List<BookForListDTO> getBooks(List<Filter> filters);

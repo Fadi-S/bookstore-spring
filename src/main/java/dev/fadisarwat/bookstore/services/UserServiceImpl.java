@@ -77,4 +77,10 @@ public class UserServiceImpl implements UserService {
 
         return user;
     }
+
+    @Override
+    @Transactional
+    public void emptyCart(User user) {
+        userDAO.emptyCart(user);
+    }
 }

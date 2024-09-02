@@ -40,6 +40,12 @@ public class BookServiceImpl implements BookService {
 
     @Override
     @Transactional
+    public void saveBooks(List<Book> books) {
+        bookDAO.saveBooks(books);
+    }
+
+    @Override
+    @Transactional
     public List<BookForListDTO> getBooks(List<Filter> filters, Sort sort, int page, int size) {
         return bookDAO.getBooks(filters, sort, page, size)
                 .stream()

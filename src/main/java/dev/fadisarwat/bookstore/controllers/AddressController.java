@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 @RestController
 @RequestMapping("/api/addresses")
@@ -55,9 +56,10 @@ public class AddressController {
 
     @DeleteMapping("/{addressId}")
     public Map<String, Object> destroy(@PathVariable Long addressId) {
-        User user = this.userService.loadAddresses(User.getCurrentUser());
+        Address address = this.addressService.getAddress(addressId);
+        User user = User.getCurrentUser();
 
-        if (user.getAddresses().stream().noneMatch(a -> a.getId().equals(addressId))) {
+        if (address == null || !Objects.equals(address.getUser().getId(), user.getId())) {
             throw new NotFoundException("Address not found");
         }
 

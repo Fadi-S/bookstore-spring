@@ -15,7 +15,7 @@ import java.util.Optional;
 @Repository
 public class BookDAOImpl implements BookDAO {
 
-    private SessionFactory sessionFactory;
+    private final SessionFactory sessionFactory;
 
     BookDAOImpl(SessionFactory sessionFactory) {
         this.sessionFactory = sessionFactory;
@@ -44,6 +44,21 @@ public class BookDAOImpl implements BookDAO {
         query.setParameter("id", id);
 
         query.executeUpdate();
+    }
+
+    @Override
+    public void saveBooks(List<Book> books) {
+        Session session = sessionFactory.getCurrentSession();
+
+        int count = 0;
+        for (Book book : books) {
+            this.saveBook(book);
+
+            if ( ++count % 20 == 0 ) {
+                session.flush();
+                session.clear();
+            }
+        }
     }
 
     @Override

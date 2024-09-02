@@ -11,4 +11,5 @@ public interface BookDAO {
     void saveBook(Book book);
     Book getBook(Long id);
     void deleteBook(Long id);
+    void saveBooks(List<Book> books);
 }

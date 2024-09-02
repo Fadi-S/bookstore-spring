@@ -13,4 +13,5 @@ public interface UserService {
     User loadUserCart(User user);
     User loadAddresses(User user);
     User loadAll(User user);
+    void emptyCart(User user);
 }
