@@ -6,12 +6,12 @@ import dev.fadisarwat.bookstore.models.Address;
 import dev.fadisarwat.bookstore.models.Book;
 import dev.fadisarwat.bookstore.models.Order;
 import dev.fadisarwat.bookstore.models.User;
+import dev.fadisarwat.bookstore.services.AddressService;
 import dev.fadisarwat.bookstore.services.BookService;
 import dev.fadisarwat.bookstore.services.OrderService;
 import dev.fadisarwat.bookstore.services.UserService;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 import java.util.Map;
 
@@ -22,10 +22,12 @@ public class CartController {
     private final UserService userService;
     private final BookService bookService;
     private final OrderService orderService;
-    CartController(UserService userService, BookService bookService, OrderService orderService) {
+    private final AddressService addressService;
+    CartController(UserService userService, BookService bookService, OrderService orderService, AddressService addressService) {
         this.userService = userService;
         this.bookService = bookService;
         this.orderService = orderService;
+        this.addressService = addressService;
     }
 
     @GetMapping("/cart")
@@ -70,12 +72,8 @@ public class CartController {
 
     @PostMapping("/cart/checkout")
     public Map<String, Object> checkout(HttpServletResponse response, @RequestParam String addressId) {
-        User user = this.userService.loadAll(User.getCurrentUser());
-
-        Address address = user.getAddresses().stream()
-                .filter(a -> a.getId().equals(Long.parseLong(addressId)))
-                .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("Address not found " + addressId));
+        User user = this.userService.loadUserCart(User.getCurrentUser());
+        Address address = this.addressService.getAddress(Long.parseLong(addressId));
 
         if (user.getBooksInCart().isEmpty()) {
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
@@ -106,9 +104,8 @@ public class CartController {
         });
 
         this.orderService.saveOrder(order);
-
         this.userService.saveUser(user);
-        user.setBooksInCart(List.of());
+        user.emptyCart();
         this.userService.saveUser(user);
 
         return Map.of("message", "success");

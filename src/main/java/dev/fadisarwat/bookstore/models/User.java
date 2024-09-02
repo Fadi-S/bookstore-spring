@@ -192,6 +192,10 @@ public class User {
         }
     }
 
+    public void emptyCart() {
+        this.booksInCart.removeIf(_ -> true);
+    }
+
     public List<Address> getAddresses() {
         return addresses;
     }
