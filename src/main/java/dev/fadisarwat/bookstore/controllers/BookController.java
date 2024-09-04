@@ -119,10 +119,4 @@ public class BookController {
 //        sleep(TimeUnit.SECONDS, 3);
         return this.bookService.getBook(id);
     }
-
-
-    @PostMapping
-    public void create(@ModelAttribute("book") Book book) {
-        this.bookService.saveBook(book);
-    }
 }

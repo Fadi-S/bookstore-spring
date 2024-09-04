@@ -30,6 +30,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(request -> {
                     request.requestMatchers("/api/register", "/api/login", "/api/books/**", "/api/profile/picture/**").permitAll();
                     request.requestMatchers("/api/**").authenticated();
+                    request.requestMatchers("/api/admin/**").hasAuthority("ROLE_ADMIN");
                 })
                 .csrf(AbstractHttpConfigurer::disable)
                 .addFilterAfter(bearerTokenAuthFilter, BasicAuthenticationFilter.class)

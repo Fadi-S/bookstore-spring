@@ -21,7 +21,7 @@ import java.util.Map;
 @ControllerAdvice
 public class RestExceptionHandler {
 
-    private final Boolean debug = false;
+    private final static Boolean debug = false;
 
     @ExceptionHandler
     public ResponseEntity<JsonResponse> handleException(AuthenticationFailedException e) {
@@ -88,7 +88,7 @@ public class RestExceptionHandler {
         return new ResponseEntity<>(response, status);
     }
 
-    private ResponseEntity<JsonResponse> defaultResponse(HttpStatus status, Exception e) {
+    public static ResponseEntity<JsonResponse> defaultResponse(HttpStatus status, Exception e) {
         JsonResponse response = new JsonResponse();
 
         response.setStatus(status.value());

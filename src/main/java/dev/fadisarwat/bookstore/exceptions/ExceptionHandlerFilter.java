@@ -8,6 +8,8 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
@@ -27,6 +29,11 @@ public class ExceptionHandlerFilter extends OncePerRequestFilter {
             response.setContentType("application/json");
         } catch (Exception e) {
             e.printStackTrace();
+            ResponseEntity<JsonResponse> responseEntity = RestExceptionHandler.defaultResponse(HttpStatus.INTERNAL_SERVER_ERROR, e);
+            response.setStatus(500);
+
+            response.getWriter().write(convertObjectToJson(responseEntity.getBody()));
+            response.setContentType("application/json");
         }
     }
 

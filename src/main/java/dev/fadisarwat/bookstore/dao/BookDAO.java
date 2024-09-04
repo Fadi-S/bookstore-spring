@@ -9,7 +9,7 @@ import java.util.Optional;
 
 public interface BookDAO {
     List<Book> getBooks(List<Filter> filters, Sort sort, int page, int size);
-    void saveBook(Book book);
+    Book saveBook(Book book);
     Optional<Object[]> getBook(Long id);
     void deleteBook(Long id);
     void saveBooks(List<Book> books);

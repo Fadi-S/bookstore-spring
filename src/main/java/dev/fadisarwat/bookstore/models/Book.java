@@ -1,6 +1,8 @@
 package dev.fadisarwat.bookstore.models;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,24 +17,34 @@ public class Book {
     private Long id;
 
     @Column
+    @NotNull(message="is required")
+    @Size(min = 1, message = "is required")
     private String title;
 
     @Column
+    @NotNull(message="is required")
+    @Size(min = 1, message = "is required")
     private String author;
 
     @Column
+    @NotNull(message="is required")
+    @Size(min = 1, message = "is required")
     private String genre;
 
     @Column(name="price_in_pennies")
+    @NotNull(message="is required")
     private Long priceInPennies;
 
     @Column
+    @NotNull(message="is required")
     private Long quantity;
 
     @Column
     private String cover;
 
     @Column
+    @NotNull(message="is required")
+    @Size(min = 1, message = "is required")
     private String overview;
 
     @OneToMany(mappedBy="book", fetch=FetchType.LAZY, cascade = CascadeType.ALL)
@@ -40,6 +52,17 @@ public class Book {
 
     @Transient
     private Double averageRating;
+
+    public Book() {}
+
+    public Book(String title, String author, String genre, String overview, Long priceInPennies, Long quantity) {
+        this.setTitle(title);
+        this.setAuthor(author);
+        this.setGenre(genre);
+        this.setOverview(overview);
+        this.setPriceInPennies(priceInPennies);
+        this.setQuantity(quantity);
+    }
 
     public void setId(Long id) {
         this.id = id;
@@ -75,6 +98,10 @@ public class Book {
 
     public Long getPriceInPennies() {
         return priceInPennies;
+    }
+
+    public Double getPrice() {
+        return priceInPennies / 100.0;
     }
 
     public void setPriceInPennies(Long priceInPennies) {
@@ -115,6 +142,12 @@ public class Book {
     }
 
     public String getCover() {
+        return getCover(false);
+    }
+
+    public String getCover(Boolean original) {
+        if (original) return cover;
+
         return cover == null ? "default" : cover;
     }
 

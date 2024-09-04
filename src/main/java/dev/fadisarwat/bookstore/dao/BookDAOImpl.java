@@ -22,10 +22,10 @@ public class BookDAOImpl implements BookDAO {
     }
 
     @Override
-    public void saveBook(Book book) {
+    public Book saveBook(Book book) {
         Session session = sessionFactory.getCurrentSession();
 
-        session.merge(book);
+        return session.merge(book);
     }
 
     @Override

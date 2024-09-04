@@ -8,7 +8,7 @@ import dev.fadisarwat.bookstore.dto.BookForListDTO;
 import java.util.List;
 
 public interface BookService {
-    void saveBook(Book book);
+    Book saveBook(Book book);
     Book getBook(Long id);
     void deleteBook(Long id);
     void saveBooks(List<Book> books);
