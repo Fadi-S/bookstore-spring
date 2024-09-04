@@ -1,5 +1,6 @@
 package dev.fadisarwat.bookstore.models;
 
+import dev.fadisarwat.bookstore.controllers.ProfileController;
 import dev.fadisarwat.bookstore.dto.ShoppingCartItemDTO;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
@@ -53,8 +54,11 @@ public class User {
 
     @Column(name = "password")
     @NotNull(message = "is required")
-    @Size(min = 1, message = "is required")
+    @Size(min = 6, message = "Password must be bigger than 6 characters")
     private String password;
+
+    @Column
+    private String picture;
 
     @ElementCollection
     @CollectionTable(name = "authorities", joinColumns = @JoinColumn(name = "user_id"))
@@ -89,9 +93,11 @@ public class User {
 
     public Map<String, Object> get() {
         HashMap<String, Object> json = new HashMap<>();
-        json.put("firstName", this.firstName);
-        json.put("lastName", this.lastName);
-        json.put("email", this.email);
+        json.put("firstName", this.getFirstName());
+        json.put("lastName", this.getLastName());
+        json.put("email", this.getEmail());
+        json.put("picture", this.getPicture());
+        json.put("timestamp", new Date().getTime());
         return json;
     }
 
@@ -221,4 +227,29 @@ public class User {
 
         this.addresses.add(address);
     }
+
+    public String getPicture() {
+        return getPicture(false);
+    }
+
+    public String getPicture(Boolean original) {
+        if (original) return picture;
+
+        return picture == null ? "default" : picture;
+    }
+
+    public void setPicture(String picture) {
+        this.picture = picture;
+    }
+
+    public static String picturePath() {
+        return "src/main/resources/static/images/users";
+    }
+
+    public void updateUsing(ProfileController.UserProfile user) {
+        this.setFirstName(user.firstName());
+        this.setLastName(user.lastName());
+        this.setEmail(user.email());
+    }
+
 }

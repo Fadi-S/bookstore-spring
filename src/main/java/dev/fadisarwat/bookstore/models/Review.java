@@ -1,5 +1,7 @@
 package dev.fadisarwat.bookstore.models;
 
+import dev.fadisarwat.bookstore.dto.UserDTO;
+import dev.fadisarwat.bookstore.dto.UserForReviewDTO;
 import jakarta.persistence.*;
 
 @Entity
@@ -16,6 +18,10 @@ public class Review {
 
     @Column
     private String body;
+
+    @ManyToOne
+    @JoinColumn(name="user_id")
+    private User user;
 
     @ManyToOne
     @JoinColumn(name="book_id")
@@ -43,5 +49,13 @@ public class Review {
 
     public void setBody(String body) {
         this.body = body;
+    }
+
+    public UserForReviewDTO getUser() {
+        return UserForReviewDTO.fromUser(user);
+    }
+
+    public void setUser(User user) {
+        this.user = user;
     }
 }

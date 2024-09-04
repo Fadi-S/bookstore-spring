@@ -1,7 +1,5 @@
 package dev.fadisarwat.bookstore.models;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.persistence.*;
 
 import java.util.ArrayList;
@@ -31,8 +29,17 @@ public class Book {
     @Column
     private Long quantity;
 
+    @Column
+    private String cover;
+
+    @Column
+    private String overview;
+
     @OneToMany(mappedBy="book", fetch=FetchType.LAZY, cascade = CascadeType.ALL)
     private List<Review> reviews;
+
+    @Transient
+    private Double averageRating;
 
     public void setId(Long id) {
         this.id = id;
@@ -105,5 +112,33 @@ public class Book {
         }
 
         return super.equals(obj);
+    }
+
+    public String getCover() {
+        return cover == null ? "default" : cover;
+    }
+
+    public static String coverPath() {
+        return "src/main/resources/static/images/books";
+    }
+
+    public void setCover(String cover) {
+        this.cover = cover;
+    }
+
+    public String getOverview() {
+        return overview;
+    }
+
+    public void setOverview(String description) {
+        this.overview = description;
+    }
+
+    public Double getAverageRating() {
+        return averageRating;
+    }
+
+    public void setAverageRating(Double averageRating) {
+        this.averageRating = averageRating;
     }
 }

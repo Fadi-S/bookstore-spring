@@ -41,7 +41,7 @@ public class OauthTokenDAOImpl implements OauthTokenDAO {
     public void deleteToken(String token) {
         Session session = sessionFactory.getCurrentSession();
 
-        MutationQuery query = session.createMutationQuery("delete from OauthToken where id=:token");
+        MutationQuery query = session.createMutationQuery("delete from OauthToken where token=:token");
 
         query.setParameter("token", token);
 

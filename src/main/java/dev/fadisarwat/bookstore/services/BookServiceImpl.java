@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -29,7 +30,12 @@ public class BookServiceImpl implements BookService {
     @Override
     @Transactional
     public Book getBook(Long id) {
-        return bookDAO.getBook(id);
+        Object[] def = {null, 0};
+        Object[] result = bookDAO.getBook(id).orElse(def);
+        Book book = (Book) result[0];
+        Double averageRating = (Double) result[1];
+        book.setAverageRating(averageRating);
+        return book;
     }
 
     @Override

@@ -29,10 +29,18 @@ public class BookDAOImpl implements BookDAO {
     }
 
     @Override
-    public Book getBook(Long id) {
+    public Optional<Object[]> getBook(Long id) {
         Session session = sessionFactory.getCurrentSession();
 
-        return session.find(Book.class, id);
+        Query<Object[]> query = session.createQuery(
+                "SELECT b, AVG(r.rating) as averageRating " +
+                "FROM Book b LEFT JOIN Review r ON b.id = r.book.id " +
+                "WHERE b.id = :bookId " +
+                "GROUP BY b.id", Object[].class);
+
+        query.setParameter("bookId", id);
+
+        return Optional.ofNullable(query.getSingleResultOrNull());
     }
 
     @Override
@@ -65,7 +73,7 @@ public class BookDAOImpl implements BookDAO {
     public List<Book> getBooks(List<Filter> filters, Sort sort, int page, int size) {
         Session session = sessionFactory.getCurrentSession();
 
-        final List<String> fields = List.of("title", "author", "genre", "priceInPennies");
+        final List<String> fields = List.of("id", "title", "author", "genre", "priceInPennies");
         if (sort != null && !fields.contains(sort.getField())) {
             throw new IllegalArgumentException("Invalid sort field");
         }

@@ -1,6 +1,7 @@
 package dev.fadisarwat.bookstore.json;
 
 import dev.fadisarwat.bookstore.exceptions.AuthenticationFailedException;
+import dev.fadisarwat.bookstore.exceptions.EmailAlreadyExistsException;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.ConstraintViolationException;
 import org.json.JSONObject;
@@ -13,7 +14,9 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
+import java.io.IOException;
 import java.util.Arrays;
+import java.util.Map;
 
 @ControllerAdvice
 public class RestExceptionHandler {
@@ -25,6 +28,19 @@ public class RestExceptionHandler {
         return defaultResponse(HttpStatus.UNAUTHORIZED, e);
     }
 
+    @ExceptionHandler
+    public ResponseEntity<JsonResponse> handleException(IOException e) {
+        return defaultResponse(HttpStatus.NOT_FOUND, e);
+    }
+
+    @ExceptionHandler
+    public ResponseEntity<JsonResponse> handleException(EmailAlreadyExistsException e) {
+        JsonResponse response = new JsonResponse();
+        response.setErrors(new JSONObject().put("email", e.getMessage()));
+        response.setHttpStatus(HttpStatus.BAD_REQUEST);
+
+        return response.get();
+    }
 
     @ExceptionHandler
     public ResponseEntity<JsonResponse> handleException(IllegalArgumentException e) {

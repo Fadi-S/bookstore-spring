@@ -1,6 +1,7 @@
 package dev.fadisarwat.bookstore.controllers;
 
 import dev.fadisarwat.bookstore.exceptions.AuthenticationFailedException;
+import dev.fadisarwat.bookstore.exceptions.EmailAlreadyExistsException;
 import dev.fadisarwat.bookstore.json.JsonResponse;
 import dev.fadisarwat.bookstore.models.User;
 import dev.fadisarwat.bookstore.services.OauthTokenService;
@@ -16,8 +17,8 @@ import java.util.Map;
 @RequestMapping("/api")
 public class AuthenticationController {
 
-    private OauthTokenService oauthTokenService;
-    private UserService userService;
+    private final OauthTokenService oauthTokenService;
+    private final UserService userService;
 
     AuthenticationController(OauthTokenService oauthTokenService, UserService userService) {
         this.oauthTokenService = oauthTokenService;
@@ -31,11 +32,18 @@ public class AuthenticationController {
         binder.registerCustomEditor(String.class, editor);
     }
 
+    public record UserAuth(String email, String password) {}
+
     @PostMapping("/login")
     public Map<String, Object> login(
-            @RequestParam(required = false) String email,
-            @RequestParam(required = false) String password
+            @RequestBody(required = false) UserAuth userAuth
     ) {
+        if (userAuth == null) {
+            throw new AuthenticationFailedException("Email and password must be provided");
+        }
+
+        String email = userAuth.email, password = userAuth.password;
+
         User user = this.userService.getUser(email);
         if (user == null || !user.matchPassword(password)) {
             throw new AuthenticationFailedException("Credentials doesn't match any user");
@@ -56,10 +64,7 @@ public class AuthenticationController {
     @PostMapping("/register")
     public Map<String, Object> register(@RequestBody User user) {
         if(this.userService.getUser(user.getEmail()) != null) {
-            JsonResponse response = new JsonResponse();
-            response.setErrors(new JSONObject().put("email", "User already exists"));
-
-            return response.toMap();
+            throw new EmailAlreadyExistsException("Email already exists");
         }
 
         return new JSONObject()
@@ -67,5 +72,18 @@ public class AuthenticationController {
                 .put("user", user.get())
                 .put("authorities", user.getAuthoritiesString())
                 .toMap();
+    }
+
+    @DeleteMapping("/logout")
+    public String logout(@RequestHeader(value="Authorization") String authHeader) {
+        if (authHeader == null) {
+            return "Success";
+        }
+
+        String token = authHeader.substring(7);
+
+        this.oauthTokenService.deleteToken(token);
+
+        return "Token deleted";
     }
 }
