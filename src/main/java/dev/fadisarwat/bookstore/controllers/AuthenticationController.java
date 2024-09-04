@@ -75,15 +75,30 @@ public class AuthenticationController {
     }
 
     @DeleteMapping("/logout")
-    public String logout(@RequestHeader(value="Authorization") String authHeader) {
+    public Boolean logout(@RequestHeader(value="Authorization") String authHeader) {
         if (authHeader == null) {
-            return "Success";
+            return false;
         }
 
         String token = authHeader.substring(7);
 
         this.oauthTokenService.deleteToken(token);
 
-        return "Token deleted";
+        return true;
+    }
+
+    @GetMapping("/user")
+    public Map<String, Object> getUser(@RequestHeader(value="Authorization") String authHeader) {
+        JsonResponse response = new JsonResponse();
+        String token = authHeader.substring(7);
+        User user = User.getCurrentUser();
+
+        JSONObject json = new JSONObject();
+        json.put("token", token);
+        json.put("authorities", user.getAuthoritiesString());
+        json.put("user", user.get());
+        response.setMessage(json);
+
+        return json.toMap();
     }
 }
