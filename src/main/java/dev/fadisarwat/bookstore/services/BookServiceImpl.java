@@ -33,7 +33,13 @@ public class BookServiceImpl implements BookService {
         Object[] def = {null, 0};
         Object[] result = bookDAO.getBook(id).orElse(def);
         Book book = (Book) result[0];
-        Double averageRating = (Double) result[1];
+        Double averageRating;
+        if (result[1] instanceof Integer) {
+            Integer res = (Integer) result[1];
+            averageRating = Double.valueOf(res);
+        }else {
+            averageRating = (Double) result[1];
+        }
         book.setAverageRating(averageRating);
         return book;
     }

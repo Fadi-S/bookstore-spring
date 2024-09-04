@@ -2,14 +2,17 @@ package dev.fadisarwat.bookstore.controllers;
 
 import dev.fadisarwat.bookstore.dto.BookForListDTO;
 import dev.fadisarwat.bookstore.dto.BookFormDTO;
+import dev.fadisarwat.bookstore.json.JsonResponse;
 import dev.fadisarwat.bookstore.models.Book;
 import dev.fadisarwat.bookstore.services.BookService;
 import dev.fadisarwat.bookstore.services.ImageService;
 import org.springframework.beans.propertyeditors.StringTrimmerEditor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/admin/books")
@@ -84,5 +87,15 @@ public class AdminBookController {
         }
 
         return BookForListDTO.fromBook(book);
+    }
+
+    @DeleteMapping("/{bookId}")
+    public ResponseEntity<JsonResponse> delete(@PathVariable Long bookId) {
+        bookService.deleteBook(bookId);
+
+        JsonResponse response = new JsonResponse();
+        response.setMessage("Book deleted successfully");
+
+        return response.get();
     }
 }
