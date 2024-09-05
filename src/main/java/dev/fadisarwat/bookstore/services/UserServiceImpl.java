@@ -83,4 +83,9 @@ public class UserServiceImpl implements UserService {
     public void emptyCart(User user) {
         userDAO.emptyCart(user);
     }
+
+    @Override
+    public Integer cartItemsCount(User user) {
+        return userDAO.cartItemsCount(user);
+    }
 }

@@ -10,4 +10,5 @@ public interface UserDAO {
     User getUser(String email);
     void deleteUser(Long id);
     void emptyCart(User user);
+    Integer cartItemsCount(User user);
 }

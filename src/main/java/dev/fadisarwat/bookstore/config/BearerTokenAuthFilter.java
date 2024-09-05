@@ -55,10 +55,7 @@ public class BearerTokenAuthFilter extends OncePerRequestFilter {
         if (oauthToken == null) {
             return null;
         }
-        List<String> authorities = this.oauthTokenService.getAuthorities(oauthToken);
-        User user = oauthToken.getUser();
-        user.setAuthorities(authorities);
 
-        return user;
+        return oauthToken.getUser();
     }
 }

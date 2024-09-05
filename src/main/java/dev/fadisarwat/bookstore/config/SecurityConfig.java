@@ -21,8 +21,11 @@ import java.util.Collections;
 @Configuration
 public class SecurityConfig {
 
-    @Autowired
-    BearerTokenAuthFilter bearerTokenAuthFilter;
+    private final BearerTokenAuthFilter bearerTokenAuthFilter;
+
+    SecurityConfig(BearerTokenAuthFilter bearerTokenAuthFilter) {
+        this.bearerTokenAuthFilter = bearerTokenAuthFilter;
+    }
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -34,7 +37,7 @@ public class SecurityConfig {
                 })
                 .csrf(AbstractHttpConfigurer::disable)
                 .addFilterAfter(bearerTokenAuthFilter, BasicAuthenticationFilter.class)
-                .addFilterBefore(new ExceptionHandlerFilter(), BasicAuthenticationFilter.class)
+                .addFilterAfter(new ExceptionHandlerFilter(), BasicAuthenticationFilter.class)
         ;
         return http.build();
     }

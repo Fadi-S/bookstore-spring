@@ -51,6 +51,12 @@ public class CartController {
         );
     }
 
+    @GetMapping("/cart/count")
+    public Integer itemsCount() {
+        User user = User.getCurrentUser();
+        return userService.cartItemsCount(user);
+    }
+
     @PostMapping("/cart/{bookId}/add")
     public Map<String, Object> addToCart(@PathVariable String bookId, @RequestParam(required = false) Long quantity, HttpServletResponse response) {
         Book book = this.bookService.getBook(Long.parseLong(bookId));

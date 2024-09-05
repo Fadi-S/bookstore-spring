@@ -65,6 +65,18 @@ public class UserDAOImpl implements UserDAO {
         query.executeUpdate();
     }
 
+    @Override
+    public Integer cartItemsCount(User user) {
+        Session session = sessionFactory.getCurrentSession();
+
+        Query<Long> query = session.createQuery("Select count(*) from ShoppingCartItem where user=:user group by user", Long.class);
+        query.setParameter("user", user);
+
+        Long count = query.getSingleResultOrNull();
+
+        return Math.toIntExact(count == null ? 0 : count);
+    }
+
     public List<User> getUsers() {
         Session session = sessionFactory.getCurrentSession();
 

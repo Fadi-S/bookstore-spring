@@ -18,6 +18,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -129,7 +130,11 @@ public class BookController {
             book.setPurchased(purchased);
 
             if(purchased) {
-                book.setWroteReview(reviewService.wroteReview(id, user.getId()));
+                book.setWroteReview(
+                        book.getReviews()
+                                .stream()
+                                .anyMatch((review) -> Objects.equals(review.user().getId(), user.getId()))
+                );
             }
         }
 

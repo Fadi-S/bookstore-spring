@@ -22,7 +22,7 @@ public class OrderController {
     @GetMapping
     public List<OrderDTO> getOrders() {
         User user = User.getCurrentUser();
-        return orderService.getOrders(user.getId()).stream().map(
+        return orderService.getOrders(user).stream().map(
                 OrderDTO::fromOrder
         ).toList();
     }

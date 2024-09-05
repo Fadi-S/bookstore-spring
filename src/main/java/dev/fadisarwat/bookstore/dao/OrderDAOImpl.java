@@ -1,6 +1,7 @@
 package dev.fadisarwat.bookstore.dao;
 
 import dev.fadisarwat.bookstore.models.Order;
+import dev.fadisarwat.bookstore.models.User;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.query.MutationQuery;
@@ -53,11 +54,25 @@ public class OrderDAOImpl implements OrderDAO {
     }
 
     @Override
-    public List<Order> getOrders(Long userId) {
+    public List<Order> getOrdersPaginated(int page, int size) {
         Session session = sessionFactory.getCurrentSession();
 
-        Query<Order> query = session.createNativeQuery("Select * from orders where user_id=:userId order by id desc", Order.class);
-        query.setParameter("userId", userId);
+        Query<Order> query = session.createQuery("from Order order by id desc", Order.class);
+
+        if (page > 0 && size > 0) {
+            query.setFirstResult((page - 1) * size);
+            query.setMaxResults(size);
+        }
+
+        return query.getResultList();
+    }
+
+    @Override
+    public List<Order> getOrders(User user) {
+        Session session = sessionFactory.getCurrentSession();
+
+        Query<Order> query = session.createQuery("Select o from Order o join fetch o.bookOrders bo join fetch bo.book b where user=:user order by o.id desc", Order.class);
+        query.setParameter("user", user);
 
         return query.getResultList();
     }

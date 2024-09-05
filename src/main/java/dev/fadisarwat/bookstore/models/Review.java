@@ -55,6 +55,10 @@ public class Review {
         return UserForReviewDTO.fromUser(user);
     }
 
+    public User user() {
+        return user;
+    }
+
     public void setUser(User user) {
         this.user = user;
     }

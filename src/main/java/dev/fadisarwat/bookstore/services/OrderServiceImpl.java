@@ -78,8 +78,13 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    public List<Order> getOrdersPaginated(int page, int size) {
+        return orderDOA.getOrdersPaginated(page, size);
+    }
+
+    @Override
     @Transactional
-    public List<Order> getOrders(Long userId) {
-        return orderDOA.getOrders(userId);
+    public List<Order> getOrders(User user) {
+        return orderDOA.getOrders(user);
     }
 }

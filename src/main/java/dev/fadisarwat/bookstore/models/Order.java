@@ -81,7 +81,8 @@ public class Order {
     public enum Status {
         PENDING("Pending"),
         SHIPPED("Shipped"),
-        DELIVERED("Delivered");
+        DELIVERED("Delivered"),
+        CANCELED("Canceled");
 
         private final String description;
 
@@ -133,7 +134,7 @@ public class Order {
     @JoinColumn(name = "user_id")
     private User user;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "address_id")
     private Address address;
 
@@ -156,7 +157,7 @@ public class Order {
     @Column(name="number")
     private String number;
 
-    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, mappedBy = "order", orphanRemoval = true)
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "order", orphanRemoval = true)
     private List<BookOrder> bookOrders;
 
     public void addBookOrder(Book book, Long quantity) {

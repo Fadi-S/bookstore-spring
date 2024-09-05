@@ -34,7 +34,10 @@ public class OauthTokenDAOImpl implements OauthTokenDAO {
     public OauthToken getToken(String token) {
         Session session = sessionFactory.getCurrentSession();
 
-        return session.find(OauthToken.class, token);
+        Query<OauthToken> query = session.createQuery("Select o from OauthToken o join fetch o.user u join fetch u.authorities where token=:token", OauthToken.class);
+        query.setParameter("token", token);
+
+         return query.getSingleResultOrNull();
     }
 
     @Override
