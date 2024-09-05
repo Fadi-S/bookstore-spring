@@ -3,7 +3,7 @@ package dev.fadisarwat.bookstore.services;
 import dev.fadisarwat.bookstore.dao.BookDAO;
 import dev.fadisarwat.bookstore.dao.OrderDAO;
 import dev.fadisarwat.bookstore.dao.UserDAO;
-import dev.fadisarwat.bookstore.dto.ShoppingCartItemDTO;
+import dev.fadisarwat.bookstore.helpers.Pagination;
 import dev.fadisarwat.bookstore.models.Address;
 import dev.fadisarwat.bookstore.models.Book;
 import dev.fadisarwat.bookstore.models.Order;
@@ -78,8 +78,9 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public List<Order> getOrdersPaginated(int page, int size) {
-        return orderDOA.getOrdersPaginated(page, size);
+    public Pagination<Order> getOrders(int page, int size)
+    {
+        return orderDOA.getOrders(page, size);
     }
 
     @Override
