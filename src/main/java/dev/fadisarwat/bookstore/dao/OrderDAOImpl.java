@@ -31,7 +31,18 @@ public class OrderDAOImpl implements OrderDAO {
     public Order getOrder(Long id) {
         Session session = sessionFactory.getCurrentSession();
 
-        return session.find(Order.class, id);
+        Query<Order> query = session.createQuery(
+                "Select o from Order o" +
+                        " join fetch o.user u" +
+                        " join fetch o.address a " +
+                        " join fetch o.bookOrders bo " +
+                        " join fetch bo.book b " +
+                        "where o.id=:id",
+                Order.class);
+
+        query.setParameter("id", id);
+
+        return query.getSingleResultOrNull();
     }
 
     @Override
@@ -58,7 +69,7 @@ public class OrderDAOImpl implements OrderDAO {
     public Pagination<Order> getOrders(int page, int size) {
         Session session = sessionFactory.getCurrentSession();
 
-        Query<Order> query = session.createQuery("from Order order by id desc", Order.class);
+        Query<Order> query = session.createQuery("Select o from Order o join fetch o.user u order by o.id desc", Order.class);
 
         if (page > 0 && size > 0) {
             query.setFirstResult((page - 1) * size);
