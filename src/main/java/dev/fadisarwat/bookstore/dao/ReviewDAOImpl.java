@@ -19,10 +19,21 @@ public class ReviewDAOImpl implements ReviewDAO {
     }
 
     @Override
-    public void saveReview(Review review) {
+    public Review saveReview(Review review) {
         Session session = sessionFactory.getCurrentSession();
 
-        session.merge(review);
+        return session.merge(review);
+    }
+
+    @Override
+    public Boolean wroteReview(Long bookId, Long userId) {
+        Session session = sessionFactory.getCurrentSession();
+
+        Query<Long> query = session.createNativeQuery("SELECT id from review where user_id=:userId and book_id=:bookId", Long.class);
+        query.setParameter("bookId", bookId);
+        query.setParameter("userId", userId);
+
+        return ! query.getResultList().isEmpty();
     }
 
     @Override

@@ -18,8 +18,14 @@ public class ReviewServiceImpl implements ReviewService {
 
     @Override
     @Transactional
-    public void saveReview(Review address) {
-        reviewDAO.saveReview(address);
+    public Review saveReview(Review address) {
+        return reviewDAO.saveReview(address);
+    }
+
+    @Override
+    @Transactional
+    public Boolean wroteReview(Long bookId, Long userId) {
+        return reviewDAO.wroteReview(bookId, userId);
     }
 
     @Override

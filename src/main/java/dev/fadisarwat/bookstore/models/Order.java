@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -68,10 +70,18 @@ public class Order {
         this.createdAt = createdAt;
     }
 
+    public String getNumber() {
+        return number;
+    }
+
+    public void setNumber(String number) {
+        this.number = number;
+    }
+
     public enum Status {
-        PENDING("pending"),
-        SHIPPED("shipped"),
-        DELIVERED("delivered");
+        PENDING("Pending"),
+        SHIPPED("Shipped"),
+        DELIVERED("Delivered");
 
         private final String description;
 
@@ -92,6 +102,26 @@ public class Order {
         this.priceInPennies = priceInPennies;
         this.paid = paid;
         this.status = status;
+        this.number = generateNumber();
+        this.createdAt = new Date();
+    }
+
+    private String generateNumber() {
+        final String chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        try {
+            final SecureRandom secureRandom = SecureRandom.getInstanceStrong();
+            final int tokenLength = 8;
+
+            return secureRandom
+                    .ints(tokenLength, 0, chars.length())
+                    .mapToObj(chars::charAt)
+                    .collect(StringBuilder::new, StringBuilder::append, StringBuilder::append)
+                    .toString();
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
+
+        return null;
     }
 
     @Id
@@ -123,6 +153,9 @@ public class Order {
     @Column(name="created_at")
     private Date createdAt;
 
+    @Column(name="number")
+    private String number;
+
     @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, mappedBy = "order", orphanRemoval = true)
     private List<BookOrder> bookOrders;
 
@@ -131,7 +164,7 @@ public class Order {
             bookOrders = new ArrayList<>();
         }
 
-        BookOrder bookOrder = new BookOrder(book, this, quantity);
+        BookOrder bookOrder = new BookOrder(book, this, quantity, book.getPriceInPennies());
 
         bookOrders.add(bookOrder);
     }

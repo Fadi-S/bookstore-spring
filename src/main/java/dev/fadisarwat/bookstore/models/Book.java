@@ -53,6 +53,12 @@ public class Book {
     @Transient
     private Double averageRating;
 
+    @Transient
+    private Boolean isPurchased = false;
+
+    @Transient
+    private Boolean wroteReview = false;
+
     public Book() {}
 
     public Book(String title, String author, String genre, String overview, Long priceInPennies, Long quantity) {
@@ -173,5 +179,21 @@ public class Book {
 
     public void setAverageRating(Double averageRating) {
         this.averageRating = averageRating;
+    }
+
+    public Boolean getPurchased() {
+        return isPurchased;
+    }
+
+    public void setPurchased(Boolean purchased) {
+        isPurchased = purchased;
+    }
+
+    public Boolean getWroteReview() {
+        return wroteReview;
+    }
+
+    public void setWroteReview(Boolean wroteReview) {
+        this.wroteReview = wroteReview;
     }
 }

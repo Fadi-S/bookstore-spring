@@ -1,5 +1,6 @@
 package dev.fadisarwat.bookstore.dto;
 
+import dev.fadisarwat.bookstore.models.Book;
 import dev.fadisarwat.bookstore.models.BookOrder;
 import dev.fadisarwat.bookstore.models.Order;
 
@@ -8,28 +9,36 @@ import java.util.List;
 
 public class OrderDTO {
 
-    private Long priceInPennies;
-    private Order.Status status;
-    private List<BookForListDTO> books;
-    private Date createdAt;
-    private Boolean isPaid;
+    private final Long priceInPennies;
+    private final String status;
+    private final List<BookForListDTO> books;
+    private final Date createdAt;
+    private final Boolean isPaid;
+    private final String number;
 
-    public OrderDTO(Long priceInPennies, Order.Status status, Date createdAt, Boolean isPaid, List<BookOrder> bookOrders) {
+    public OrderDTO(Long priceInPennies, String status, Date createdAt, Boolean isPaid, List<BookOrder> bookOrders, String number) {
         this.priceInPennies = priceInPennies;
         this.createdAt = createdAt;
         this.status = status;
         this.isPaid = isPaid;
+        this.number = number;
 
-        this.books = bookOrders.stream().map((bookOrder) -> BookForListDTO.fromBook(bookOrder.getBook())).toList();
+        this.books = bookOrders.stream().map((bookOrder) -> {
+            Book book = bookOrder.getBook();
+            book.setPriceInPennies(bookOrder.getPriceInPennies());
+            book.setQuantity(bookOrder.getQuantity());
+            return BookForListDTO.fromBook(book);
+        }).toList();
     }
 
     public static OrderDTO fromOrder(Order order) {
         return new OrderDTO(
                 order.getPriceInPennies(),
-                order.getStatus(),
+                order.getStatus().getDescription(),
                 order.getCreatedAt(),
                 order.getPaid(),
-                order.getBookOrders()
+                order.getBookOrders(),
+                order.getNumber()
         );
 
     }
@@ -38,7 +47,7 @@ public class OrderDTO {
         return priceInPennies;
     }
 
-    public Order.Status getStatus() {
+    public String getStatus() {
         return status;
     }
 
@@ -52,5 +61,9 @@ public class OrderDTO {
 
     public Boolean getPaid() {
         return isPaid;
+    }
+
+    public String getNumber() {
+        return number;
     }
 }

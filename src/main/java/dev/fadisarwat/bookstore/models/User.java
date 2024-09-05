@@ -27,7 +27,12 @@ public class User {
     }
 
     public static User getCurrentUser() {
-        return (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if(principal instanceof User) {
+            return (User) principal;
+        }
+
+        return null;
     }
 
     @Id
@@ -179,7 +184,7 @@ public class User {
 
         quantity = quantity == null ? 0 : quantity;
 
-        if(book.getQuantity() < quantity) {
+        if(book.getQuantity() < quantity || book.getQuantity() == 0) {
             return false;
         }
 

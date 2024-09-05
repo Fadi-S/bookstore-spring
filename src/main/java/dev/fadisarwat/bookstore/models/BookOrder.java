@@ -21,12 +21,16 @@ public class BookOrder {
     @Column
     private Long quantity;
 
+    @Column(name="price_in_pennies")
+    private Long priceInPennies;
+
     public BookOrder() {}
 
-    public BookOrder(Book book, Order order, Long quantity) {
+    public BookOrder(Book book, Order order, Long quantity, Long priceInPennies) {
         this.book = book;
         this.order = order;
         this.quantity = quantity;
+        this.priceInPennies = priceInPennies;
     }
 
     public void setId(Long id) {
@@ -59,5 +63,13 @@ public class BookOrder {
 
     public void setBook(Book book) {
         this.book = book;
+    }
+
+    public Long getPriceInPennies() {
+        return priceInPennies;
+    }
+
+    public void setPriceInPennies(Long priceInPennies) {
+        this.priceInPennies = priceInPennies;
     }
 }

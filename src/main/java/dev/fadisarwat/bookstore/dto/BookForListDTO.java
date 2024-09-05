@@ -5,7 +5,7 @@ import dev.fadisarwat.bookstore.models.Book;
 import java.io.Serializable;
 
 public record BookForListDTO(Long id, String title, String author, String genre,
-                             Long priceInPennies, String cover, String overview) implements Serializable {
+                             Long priceInPennies, String cover, String overview, Boolean isOutOfStock) implements Serializable {
 
     public static BookForListDTO fromBook(Book book) {
         return new BookForListDTO(
@@ -15,7 +15,8 @@ public record BookForListDTO(Long id, String title, String author, String genre,
                 book.getGenre(),
                 book.getPriceInPennies(),
                 book.getCover(),
-                book.getOverview()
+                book.getOverview(),
+                book.getQuantity() == 0
         );
     }
 }

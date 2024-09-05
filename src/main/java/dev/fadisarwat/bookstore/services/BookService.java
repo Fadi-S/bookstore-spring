@@ -10,6 +10,7 @@ import java.util.List;
 public interface BookService {
     Book saveBook(Book book);
     Book getBook(Long id);
+    Boolean isPurchasedByUser(Long bookId, Long userId);
     void deleteBook(Long id);
     void saveBooks(List<Book> books);
     List<BookForListDTO> getBooks(List<Filter> filters, Sort sort, int page, int size);

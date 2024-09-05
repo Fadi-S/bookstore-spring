@@ -116,4 +116,18 @@ public class BookDAOImpl implements BookDAO {
 
         return query.getResultList();
     }
+
+    @Override
+    public Boolean isPurchasedByUser(Long bookId, Long userId) {
+        Session session = sessionFactory.getCurrentSession();
+
+        Query<Long> query = session.createNativeQuery("Select orders.user_id from book " +
+                "left join `book_order` on book_order.book_id=book.id " +
+                "left join `orders` on orders.id=book_order.order_id " +
+                "where book.id=:bookId and orders.user_id=:userId", Long.class);
+        query.setParameter("bookId", bookId);
+        query.setParameter("userId", userId);
+
+        return ! query.getResultList().isEmpty();
+    }
 }

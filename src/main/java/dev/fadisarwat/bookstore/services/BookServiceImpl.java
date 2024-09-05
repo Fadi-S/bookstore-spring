@@ -29,6 +29,12 @@ public class BookServiceImpl implements BookService {
 
     @Override
     @Transactional
+    public Boolean isPurchasedByUser(Long bookId, Long userId) {
+        return bookDAO.isPurchasedByUser(bookId, userId);
+    }
+
+    @Override
+    @Transactional
     public Book getBook(Long id) {
         Object[] def = {null, 0};
         Object[] result = bookDAO.getBook(id).orElse(def);

@@ -5,8 +5,10 @@ import dev.fadisarwat.bookstore.helpers.FilterType;
 import dev.fadisarwat.bookstore.helpers.Sort;
 import dev.fadisarwat.bookstore.models.Book;
 import dev.fadisarwat.bookstore.dto.BookForListDTO;
+import dev.fadisarwat.bookstore.models.User;
 import dev.fadisarwat.bookstore.services.BookService;
 import dev.fadisarwat.bookstore.services.ImageService;
+import dev.fadisarwat.bookstore.services.ReviewService;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.propertyeditors.StringTrimmerEditor;
 import org.springframework.web.bind.WebDataBinder;
@@ -25,6 +27,7 @@ public class BookController {
 
     private final BookService bookService;
     private final ImageService imageService;
+    private final ReviewService reviewService;
 
     @InitBinder
     public void initBinder(WebDataBinder binder) {
@@ -33,9 +36,10 @@ public class BookController {
         binder.registerCustomEditor(String.class, editor);
     }
 
-    public BookController(BookService bookService, ImageService imageService) {
+    public BookController(BookService bookService, ImageService imageService, ReviewService reviewService) {
         this.bookService = bookService;
         this.imageService = imageService;
+        this.reviewService = reviewService;
     }
 
     private Integer parseInteger(String value, Integer defaultValue) {
@@ -117,6 +121,18 @@ public class BookController {
     public Book show(@PathVariable Long id) {
         // TODO: Remove after testing
 //        sleep(TimeUnit.SECONDS, 3);
-        return this.bookService.getBook(id);
+        User user = User.getCurrentUser();
+        Book book = this.bookService.getBook(id);
+
+        if (user != null) {
+            Boolean purchased = bookService.isPurchasedByUser(id, user.getId());
+            book.setPurchased(purchased);
+
+            if(purchased) {
+                book.setWroteReview(reviewService.wroteReview(id, user.getId()));
+            }
+        }
+
+        return book;
     }
 }

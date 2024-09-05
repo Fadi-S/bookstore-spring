@@ -9,6 +9,7 @@ import java.util.Optional;
 
 public interface BookDAO {
     List<Book> getBooks(List<Filter> filters, Sort sort, int page, int size);
+    Boolean isPurchasedByUser(Long bookId, Long userId);
     Book saveBook(Book book);
     Optional<Object[]> getBook(Long id);
     void deleteBook(Long id);
