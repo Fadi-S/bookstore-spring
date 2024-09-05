@@ -39,7 +39,7 @@ public class OrderServiceImpl implements OrderService {
         Order order = new Order(
                 user,
                 address,
-                user.cartTotalPriceInPennies(),
+                user.cartGeneralTotalInPennies(),
                 false,
                 Order.Status.PENDING
         );

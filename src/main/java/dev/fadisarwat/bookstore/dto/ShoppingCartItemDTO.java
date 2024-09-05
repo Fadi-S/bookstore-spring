@@ -43,4 +43,8 @@ public class ShoppingCartItemDTO {
     public Long totalPriceInPennies() {
         return book.priceInPennies() * quantity;
     }
+
+    public String getCover() {
+        return book.cover();
+    }
 }

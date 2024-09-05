@@ -56,7 +56,7 @@ public class BookController {
 
     @GetMapping
     public List<BookForListDTO> index(@RequestParam Map<String, String> allParams) {
-        int size = parseInteger(allParams.get("size"), 10);
+        int size = parseInteger(allParams.get("size"), 12);
         if (size > 100) size = 100;
 
         int page = parseInteger(allParams.get("page"), 1);

@@ -38,18 +38,25 @@ public class CartController {
 
         List<ShoppingCartItemDTO> items = user.getBooksInCart().stream().map(ShoppingCartItemDTO::fromShoppingCartItem).toList();
 
+        Long subTotal = user.cartTotalPriceInPennies();
+        Long tax = Math.round(subTotal * 0.14);
+        Long shipping = subTotal != 0 ? 100L : 0;
+
         return Map.of(
                 "items", items,
-                "total", user.cartTotalPriceInPennies()
+                "subTotal", subTotal,
+                "tax", tax,
+                "shipping", shipping,
+                "total", subTotal + tax + shipping
         );
     }
 
     @PostMapping("/cart/{bookId}/add")
-    public Map<String, Object> addToCart(@PathVariable String bookId, HttpServletResponse response) {
+    public Map<String, Object> addToCart(@PathVariable String bookId, @RequestParam(required = false) Long quantity, HttpServletResponse response) {
         Book book = this.bookService.getBook(Long.parseLong(bookId));
         User user = this.userService.loadUserCart(User.getCurrentUser());
 
-        Boolean success = user.addToCart(book);
+        Boolean success = user.addToCart(book, quantity);
         this.userService.saveUser(user);
 
         response.setStatus(success ? HttpServletResponse.SC_OK : HttpServletResponse.SC_BAD_REQUEST);
@@ -57,7 +64,7 @@ public class CartController {
         return Map.of("message", success ? "success" : "Book out of stock");
     }
 
-    @PostMapping("/cart/{bookId}/remove")
+    @DeleteMapping("/cart/{bookId}/remove")
     public Map<String, Object> removeFromCart(@PathVariable String bookId) {
         Book book = this.bookService.getBook(Long.parseLong(bookId));
         User user = this.userService.loadUserCart(User.getCurrentUser());

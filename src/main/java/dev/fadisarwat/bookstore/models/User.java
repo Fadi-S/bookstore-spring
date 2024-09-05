@@ -120,6 +120,14 @@ public class User {
                 .reduce(0L, (acc, item) -> acc + item.totalPriceInPennies(), Long::sum);
     }
 
+    public Long cartGeneralTotalInPennies() {
+        Long subTotal = this.cartTotalPriceInPennies();
+        Long tax = Math.round(subTotal * 0.14);
+        Long shipping = subTotal != 0 ? 100L : 0;
+
+        return subTotal + tax + shipping;
+    }
+
     public String getFirstName() {
         return firstName;
     }
@@ -164,21 +172,25 @@ public class User {
         this.booksInCart = booksInCart;
     }
 
-    public Boolean addToCart(Book book) {
+    public Boolean addToCart(Book book, Long quantity) {
         if (this.booksInCart == null) {
             this.booksInCart = new ArrayList<>();
         }
 
-        if(book.getQuantity() == 0) {
+        quantity = quantity == null ? 0 : quantity;
+
+        if(book.getQuantity() < quantity) {
             return false;
         }
+
+        final Long q = quantity;
 
         this.booksInCart.stream()
                 .filter(item -> item.getBook().equals(book))
                 .findFirst()
                 .ifPresentOrElse(
-                        ShoppingCartItem::incrementQuantity,
-                        () -> this.booksInCart.add(new ShoppingCartItem(book, this, 1L))
+                        (item) -> item.setQuantity(q == 0 ? item.getQuantity()+1 : q),
+                        () -> this.booksInCart.add(new ShoppingCartItem(book, this, q == 0 ? 1 : q))
                 );
 
         return true;
@@ -199,11 +211,7 @@ public class User {
             return;
         }
 
-        if(item.getQuantity() > 1) {
-            item.decrementQuantity();
-        } else {
-            this.booksInCart.remove(item);
-        }
+        this.booksInCart.removeIf((i) -> Objects.equals(i.getId(), item.getId()));
     }
 
     public void emptyCart() {

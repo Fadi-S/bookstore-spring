@@ -11,4 +11,8 @@ public record AddressDTO(Long id, String fullName, String country, String street
     public static AddressDTO fromAddress(Address address) {
         return new AddressDTO(address.getId(), address.getFullName(), address.getCountry(), address.getStreet1(), address.getStreet2(), address.getCity(), address.getPostalCode());
     }
+
+    public String getFullAddress() {
+        return postalCode() + " " + street1() + " " + street2() + ", " + city() + ", " + country();
+    }
 }
