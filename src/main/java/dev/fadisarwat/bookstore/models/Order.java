@@ -5,6 +5,7 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Entity
@@ -35,7 +36,7 @@ public class Order {
         this.paid = paid;
     }
 
-    public @NotNull(message = "is required") @Min(1) Long getPriceInPennies() {
+    public Long getPriceInPennies() {
         return priceInPennies;
     }
 
@@ -57,6 +58,14 @@ public class Order {
 
     public void setUser(User user) {
         this.user = user;
+    }
+
+    public Date getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(Date createdAt) {
+        this.createdAt = createdAt;
     }
 
     public enum Status {
@@ -110,6 +119,9 @@ public class Order {
     @Enumerated(EnumType.STRING)
     @NotNull(message="is required")
     private Status status;
+
+    @Column(name="created_at")
+    private Date createdAt;
 
     @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, mappedBy = "order", orphanRemoval = true)
     private List<BookOrder> bookOrders;

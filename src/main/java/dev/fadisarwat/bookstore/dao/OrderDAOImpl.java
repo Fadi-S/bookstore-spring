@@ -51,4 +51,14 @@ public class OrderDAOImpl implements OrderDAO {
 
         return query.getResultList();
     }
+
+    @Override
+    public List<Order> getOrders(Long userId) {
+        Session session = sessionFactory.getCurrentSession();
+
+        Query<Order> query = session.createNativeQuery("Select * from orders where user_id=:userId", Order.class);
+        query.setParameter("userId", userId);
+
+        return query.getResultList();
+    }
 }

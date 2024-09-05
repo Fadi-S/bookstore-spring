@@ -76,4 +76,10 @@ public class OrderServiceImpl implements OrderService {
     public List<Order> getOrders() {
         return orderDOA.getOrders();
     }
+
+    @Override
+    @Transactional
+    public List<Order> getOrders(Long userId) {
+        return orderDOA.getOrders(userId);
+    }
 }
