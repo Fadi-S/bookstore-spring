@@ -1,6 +1,7 @@
 package dev.fadisarwat.bookstore.dao;
 
 import dev.fadisarwat.bookstore.helpers.Filter;
+import dev.fadisarwat.bookstore.helpers.Pagination;
 import dev.fadisarwat.bookstore.helpers.Sort;
 import dev.fadisarwat.bookstore.models.Book;
 import org.hibernate.Session;
@@ -70,7 +71,7 @@ public class BookDAOImpl implements BookDAO {
     }
 
     @Override
-    public List<Book> getBooks(List<Filter> filters, Sort sort, int page, int size) {
+    public Pagination<Book> getBooks(List<Filter> filters, Sort sort, int page, int size) {
         Session session = sessionFactory.getCurrentSession();
 
         final List<String> fields = List.of("id", "title", "author", "genre", "priceInPennies");
@@ -114,7 +115,10 @@ public class BookDAOImpl implements BookDAO {
             query.setParameter(filter.getField(), filter.getValue());
         }
 
-        return query.getResultList();
+        Long count = session.createQuery("select count(*) " + queryString, Long.class)
+                .getSingleResult();
+
+        return new Pagination<>(page, size, count, query.getResultList());
     }
 
     @Override

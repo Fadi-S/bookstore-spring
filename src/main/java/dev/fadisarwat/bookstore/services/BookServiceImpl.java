@@ -2,6 +2,7 @@ package dev.fadisarwat.bookstore.services;
 
 import dev.fadisarwat.bookstore.dao.BookDAO;
 import dev.fadisarwat.bookstore.helpers.Filter;
+import dev.fadisarwat.bookstore.helpers.Pagination;
 import dev.fadisarwat.bookstore.helpers.Sort;
 import dev.fadisarwat.bookstore.models.Book;
 import dev.fadisarwat.bookstore.dto.BookForListDTO;
@@ -64,34 +65,31 @@ public class BookServiceImpl implements BookService {
 
     @Override
     @Transactional
-    public List<BookForListDTO> getBooks(List<Filter> filters, Sort sort, int page, int size) {
-        return bookDAO.getBooks(filters, sort, page, size)
-                .stream()
-                .map(BookForListDTO::fromBook)
-                .collect(Collectors.toList());
+    public Pagination<BookForListDTO> getBooks(List<Filter> filters, Sort sort, int page, int size) {
+        return bookDAO.getBooks(filters, sort, page, size).mapElements(BookForListDTO::fromBook);
     }
 
     @Override
     @Transactional
-    public List<BookForListDTO> getBooks(List<Filter> filters, Sort sort) {
+    public Pagination<BookForListDTO> getBooks(List<Filter> filters, Sort sort) {
         return getBooks(filters, sort, 0, 0);
     }
 
     @Override
     @Transactional
-    public List<BookForListDTO> getBooks(List<Filter> filters) {
+    public Pagination<BookForListDTO> getBooks(List<Filter> filters) {
         return getBooks(filters, null, 0, 0);
     }
 
     @Override
     @Transactional
-    public List<BookForListDTO> getBooks(int page, int size) {
+    public Pagination<BookForListDTO> getBooks(int page, int size) {
         return getBooks(null, null, page, size);
     }
 
     @Override
     @Transactional
-    public List<BookForListDTO> getBooks() {
+    public Pagination<BookForListDTO> getBooks() {
         return getBooks(null, null, 0, 0);
     }
 }

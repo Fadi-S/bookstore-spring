@@ -2,6 +2,7 @@ package dev.fadisarwat.bookstore.controllers;
 
 import dev.fadisarwat.bookstore.helpers.Filter;
 import dev.fadisarwat.bookstore.helpers.FilterType;
+import dev.fadisarwat.bookstore.helpers.Pagination;
 import dev.fadisarwat.bookstore.helpers.Sort;
 import dev.fadisarwat.bookstore.models.Book;
 import dev.fadisarwat.bookstore.dto.BookForListDTO;
@@ -60,7 +61,7 @@ public class BookController {
     }
 
     @GetMapping
-    public List<BookForListDTO> index(@RequestParam Map<String, String> allParams) {
+    public Pagination<BookForListDTO> index(@RequestParam Map<String, String> allParams) {
         int size = parseInteger(allParams.get("size"), 12);
         if (size > 100) size = 100;
 
@@ -97,9 +98,6 @@ public class BookController {
             sort.setDirection(sortParam.startsWith("-") ? Sort.Direction.DESC : Sort.Direction.ASC);
             sort.setField(sortParam.replaceFirst("[-+]", ""));
         }
-
-        // TODO: Remove after testing
-//        sleep(TimeUnit.SECONDS, 3);
 
 
         return this.bookService.getBooks(filters, sort , page, size);
