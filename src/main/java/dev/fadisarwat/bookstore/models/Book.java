@@ -50,6 +50,9 @@ public class Book {
     @OneToMany(mappedBy="book", fetch=FetchType.LAZY, cascade = CascadeType.ALL)
     private List<Review> reviews;
 
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "book", orphanRemoval = true)
+    private List<BookOrder> bookOrders;
+
     @Transient
     private Double averageRating;
 

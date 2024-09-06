@@ -74,7 +74,7 @@ public class BookDAOImpl implements BookDAO {
     public Pagination<Book> getBooks(List<Filter> filters, Sort sort, int page, int size) {
         Session session = sessionFactory.getCurrentSession();
 
-        final List<String> fields = List.of("id", "title", "author", "genre", "priceInPennies");
+        final List<String> fields = List.of("id", "title", "author", "genre", "price_in_pennies", "popularity");
         if (sort != null && !fields.contains(sort.getField())) {
             throw new IllegalArgumentException("Invalid sort field");
         }
@@ -85,26 +85,36 @@ public class BookDAOImpl implements BookDAO {
                 .filter(filter -> fields.contains(filter.getField()))
                 .toList();
 
-        StringBuilder queryString = new StringBuilder("from Book");
+        StringBuilder queryString = new StringBuilder("Select b.*, count(bo.id) as popularity from Book b left join book_order bo on b.id=bo.book_id");
 
+        StringBuilder filterString = new StringBuilder();
         if (!filters.isEmpty()) {
-            queryString.append(" where ");
+            filterString.append(" where ");
             for (Filter filter : filters) {
-                queryString
+                filterString
                         .append(filter.getQuery())
                         .append(" and ");
             }
-            queryString.delete(queryString.length() - 5, queryString.length());
+            filterString.delete(filterString.length() - 5, filterString.length());
         }
+
+        queryString.append(filterString);
+
+        queryString.append(" group by b.id");
 
         if (sort != null) {
-            queryString.append(" order by ")
-                    .append(sort.getField())
-                    .append(" ")
-                    .append(sort.getDirection());
+            if (sort.getField().equals("popularity")) {
+                queryString.append(" order by popularity ")
+                        .append(sort.getDirection());
+            } else {
+                queryString.append(" order by b.")
+                        .append(sort.getField())
+                        .append(" ")
+                        .append(sort.getDirection());
+            }
         }
 
-        Query<Book> query = session.createQuery(queryString.toString(), Book.class);
+        Query<Book> query = session.createNativeQuery(queryString.toString(), Book.class);
 
         if (page > 0 && size > 0) {
             query.setFirstResult((page - 1) * size);
@@ -115,7 +125,9 @@ public class BookDAOImpl implements BookDAO {
             query.setParameter(filter.getField(), filter.getValue());
         }
 
-        Long count = session.createQuery("select count(*) " + queryString, Long.class)
+        System.out.println(queryString.toString());
+
+        Long count = session.createQuery("select count(*) from Book" + filterString, Long.class)
                 .getSingleResult();
 
         return new Pagination<>(page, size, count, query.getResultList());
