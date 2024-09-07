@@ -11,6 +11,7 @@ import org.hibernate.query.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Repository
@@ -71,10 +72,24 @@ public class BookDAOImpl implements BookDAO {
     }
 
     @Override
+    public List<String> allGenres() {
+        Session session = sessionFactory.getCurrentSession();
+        Query<String> query = session.createQuery("select distinct genre from Book", String.class);
+        return query.getResultList();
+    }
+
+    @Override
+    public List<String> allAuthors() {
+        Session session = sessionFactory.getCurrentSession();
+        Query<String> query = session.createQuery("select distinct author from Book", String.class);
+        return query.getResultList();
+    }
+
+    @Override
     public Pagination<Book> getBooks(List<Filter> filters, Sort sort, int page, int size) {
         Session session = sessionFactory.getCurrentSession();
 
-        final List<String> fields = List.of("id", "title", "author", "genre", "price_in_pennies", "popularity");
+        final List<String> fields = List.of("id", "title", "author", "genre", "price_in_pennies", "popularity", "overview");
         if (sort != null && !fields.contains(sort.getField())) {
             throw new IllegalArgumentException("Invalid sort field");
         }
@@ -121,16 +136,16 @@ public class BookDAOImpl implements BookDAO {
             query.setMaxResults(size);
         }
 
+        Query<Long> countQuery = session.createNativeQuery("select count(*) from book" + filterString, Long.class);
+
         for (Filter filter : filters) {
-            query.setParameter(filter.getField(), filter.getValue());
+            for (Map.Entry<String, String> entry : filter.getParameters().entrySet()) {
+                query.setParameter(entry.getKey(), entry.getValue());
+                countQuery.setParameter(entry.getKey(), entry.getValue());
+            }
         }
 
-        System.out.println(queryString.toString());
-
-        Long count = session.createQuery("select count(*) from Book" + filterString, Long.class)
-                .getSingleResult();
-
-        return new Pagination<>(page, size, count, query.getResultList());
+        return new Pagination<>(page, size, countQuery.getSingleResult(), query.getResultList());
     }
 
     @Override

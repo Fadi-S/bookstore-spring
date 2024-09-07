@@ -1,26 +1,70 @@
 package dev.fadisarwat.bookstore.helpers;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class Filter {
     private String field;
     private String value;
-    private FilterType type;
+    private Type type;
+    private Filter orFilter;
 
-    public Filter(String field, String value, FilterType type) {
+    public enum Type {
+        EQUALS("="),
+        FUZZY("LIKE"),
+        FULL_TEXT("FTS"),
+        GREATER_THAN(">"),
+        LESS_THAN("<"),
+        IN("in");
+
+        public final String sign;
+
+        Type(String sign) {
+            this.sign = sign;
+        }
+    }
+
+    public static Filter of(String field, String value) {
+        Type type = Type.EQUALS;
+        if (value.startsWith("~")) {
+            value = value.substring(1);
+            type = Type.FUZZY;
+        } else if (value.startsWith("|")) {
+            value = value.substring(1);
+            type = Type.FULL_TEXT;
+        } else if (value.startsWith(">")) {
+            value = value.substring(1);
+            type = Type.GREATER_THAN;
+        } else if (value.startsWith("<")) {
+            value = value.substring(1);
+            type = Type.LESS_THAN;
+        } else if (value.startsWith("[]")) {
+            value = value.substring(2);
+            type = Type.IN;
+        }
+
+        return new Filter(field, value, type);
+    }
+
+    public Filter(String field, String value, Type type) {
         this.field = field;
         this.value = value;
         this.type = type;
+    }
+
+    public Filter(String field, String value, Type type, Filter orFilter) {
+        this.field = field;
+        this.value = value;
+        this.type = type;
+        this.orFilter = orFilter;
     }
 
     public String getField() {
         return field;
     }
 
-    public void setField(String field) {
-        this.field = field;
-    }
-
     public String getValue() {
-        if(type == FilterType.FUZZY) {
+        if(type == Type.FUZZY) {
             return value + "%";
         }
 
@@ -28,22 +72,60 @@ public class Filter {
     }
 
     public String getQuery() {
-        return field + " " + type.sign + " :" + field;
+        String query;
+        if(type == Type.IN) {
+            int values = value.split(",").length;
+            StringBuilder in = new StringBuilder();
+            for (int i = 0; i < values; i++) {
+                in.append(":").append(field).append(i);
+                if (i < values - 1) in.append(",");
+            }
+
+            query = field + " " + type.sign + " (" + in + ")";
+        }else if (type == Type.FULL_TEXT) {
+            query = "MATCH(" + field + ") AGAINST ('" + escapeWildcardsForMySQL(value) + "' IN BOOLEAN MODE)";
+        }else {
+            query = field + " " + type.sign + " :" + field;
+        }
+
+        return query + (orFilter != null ? " OR " + orFilter.getQuery() : "");
     }
 
-    public void setValue(String value) {
-        this.value = value;
+    private String escapeStringForMySQL(String s) {
+        return s.replaceAll("\\\\", "\\\\\\\\")
+                .replaceAll("\b","\\b")
+                .replaceAll("\n","\\n")
+                .replaceAll("\r", "\\r")
+                .replaceAll("\t", "\\t")
+                .replaceAll("\\x1A", "\\Z")
+                .replaceAll("\\x00", "\\0")
+                .replaceAll("'", "\\'")
+                .replaceAll("\"", "\\\"");
     }
 
-    public FilterType getType() {
-        return type;
+    private String escapeWildcardsForMySQL(String s) {
+        return escapeStringForMySQL(s)
+                .replaceAll("%", "\\%")
+                .replaceAll("_","\\_");
     }
 
-    public String getSign() {
-        return type.sign;
-    }
 
-    public void setType(FilterType type) {
-        this.type = type;
+    public Map<String, String> getParameters() {
+        Map<String, String> values = new HashMap<>();
+
+        if(type == Type.FULL_TEXT) {
+            values = new HashMap<>();
+        }else if(type == Type.IN) {
+            String[] split = value.split(",");
+            for (int i = 0; i < split.length; i++) {
+                values.put(field + i, split[i]);
+            }
+        } else {
+            values.put(field, getValue());
+        }
+
+        values.putAll(orFilter != null ? orFilter.getParameters() : Map.of());
+
+        return values;
     }
 }

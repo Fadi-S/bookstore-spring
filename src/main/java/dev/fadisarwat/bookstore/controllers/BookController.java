@@ -1,7 +1,6 @@
 package dev.fadisarwat.bookstore.controllers;
 
 import dev.fadisarwat.bookstore.helpers.Filter;
-import dev.fadisarwat.bookstore.helpers.FilterType;
 import dev.fadisarwat.bookstore.helpers.Pagination;
 import dev.fadisarwat.bookstore.helpers.Sort;
 import dev.fadisarwat.bookstore.models.Book;
@@ -61,7 +60,7 @@ public class BookController {
     }
 
     @GetMapping
-    public Pagination<BookForListDTO> index(@RequestParam Map<String, String> allParams) {
+    public Map<String, Object> index(@RequestParam Map<String, String> allParams) {
         int size = parseInteger(allParams.get("size"), 12);
         if (size > 100) size = 100;
 
@@ -75,20 +74,22 @@ public class BookController {
         for (Map.Entry<String, String> entry : filterParams.entrySet()) {
             String key = entry.getKey().substring(8, entry.getKey().length() - 1);
             String value = entry.getValue();
+            filters.add(Filter.of(key, value));
+        }
 
-            FilterType filterType = FilterType.EQUALS;
-            if (value.startsWith("~")) {
-                value = value.substring(1);
-                filterType = FilterType.FUZZY;
-            } else if (value.startsWith(">")) {
-                value = value.substring(1);
-                filterType = FilterType.GREATER_THAN;
-            } else if (value.startsWith("<")) {
-                value = value.substring(1);
-                filterType = FilterType.LESS_THAN;
-            }
-
-            filters.add(new Filter(key, value, filterType));
+        if(allParams.containsKey("search")) {
+            filters.add(
+                    new Filter(
+                            "title",
+                            allParams.get("search"),
+                            Filter.Type.FUZZY,
+                            new Filter(
+                                    "overview",
+                                    allParams.get("search"),
+                                    Filter.Type.FULL_TEXT
+                            )
+                    )
+            );
         }
 
         Sort sort = new Sort("id", Sort.Direction.DESC);
@@ -99,8 +100,15 @@ public class BookController {
             sort.setField(sortParam.replaceFirst("[-+]", ""));
         }
 
+        List<String> genres = bookService.allGenres();
+        List<String> authors = bookService.allAuthors();
+        Pagination<BookForListDTO> books = this.bookService.getBooks(filters, sort, page, size);
 
-        return this.bookService.getBooks(filters, sort , page, size);
+        return Map.of(
+                "books", books,
+                "genres", genres,
+                "authors", authors
+        );
     }
 
     @GetMapping("/images/{image}")

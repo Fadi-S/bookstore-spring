@@ -14,6 +14,8 @@ public interface BookService {
     Boolean isPurchasedByUser(Long bookId, Long userId);
     void deleteBook(Long id);
     void saveBooks(List<Book> books);
+    List<String> allGenres();
+    List<String> allAuthors();
     Pagination<BookForListDTO> getBooks(List<Filter> filters, Sort sort, int page, int size);
     Pagination<BookForListDTO> getBooks(List<Filter> filters, Sort sort);
     Pagination<BookForListDTO> getBooks(List<Filter> filters);

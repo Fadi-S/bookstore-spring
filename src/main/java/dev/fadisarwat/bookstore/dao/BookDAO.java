@@ -15,4 +15,6 @@ public interface BookDAO {
     Optional<Object[]> getBook(Long id);
     void deleteBook(Long id);
     void saveBooks(List<Book> books);
+    List<String> allGenres();
+    List<String> allAuthors();
 }

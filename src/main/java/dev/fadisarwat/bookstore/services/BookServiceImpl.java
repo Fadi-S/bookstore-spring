@@ -64,6 +64,16 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
+    public List<String> allGenres() {
+        return bookDAO.allGenres();
+    }
+
+    @Override
+    public List<String> allAuthors() {
+        return bookDAO.allAuthors();
+    }
+
+    @Override
     @Transactional
     public Pagination<BookForListDTO> getBooks(List<Filter> filters, Sort sort, int page, int size) {
         return bookDAO.getBooks(filters, sort, page, size).mapElements(BookForListDTO::fromBook);

@@ -3,6 +3,7 @@ package dev.fadisarwat.bookstore.models;
 import dev.fadisarwat.bookstore.dto.UserDTO;
 import dev.fadisarwat.bookstore.dto.UserForReviewDTO;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 
 @Entity
 @Table(name="review")
@@ -14,6 +15,7 @@ public class Review {
     private Long id;
 
     @Column
+    @NotNull(message="You must choose a rating")
     private Integer rating;
 
     @Column
