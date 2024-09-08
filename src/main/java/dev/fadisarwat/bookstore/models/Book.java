@@ -199,4 +199,8 @@ public class Book {
     public void setWroteReview(Boolean wroteReview) {
         this.wroteReview = wroteReview;
     }
+
+    public void returnBook(Long quantity) {
+        this.quantity += quantity;
+    }
 }

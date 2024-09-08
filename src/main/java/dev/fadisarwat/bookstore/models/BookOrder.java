@@ -33,6 +33,10 @@ public class BookOrder {
         this.priceInPennies = priceInPennies;
     }
 
+    public void returnBook() {
+        this.book.returnBook(this.quantity);
+    }
+
     public void setId(Long id) {
         this.id = id;
     }

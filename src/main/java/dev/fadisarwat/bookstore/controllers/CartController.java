@@ -116,6 +116,13 @@ public class CartController {
         if (charged) {
             order.setPaid(true);
             this.orderService.saveOrder(order);
+        }else {
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+
+            order.setStatus(Order.Status.CANCELED);
+            this.orderService.saveOrder(order);
+
+            return Map.of("message", "Payment failed");
         }
 
         return OrderDTO.fromOrder(order);

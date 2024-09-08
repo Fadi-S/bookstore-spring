@@ -28,6 +28,10 @@ public class Order {
 
     public void setStatus(@NotNull(message = "is required") Status status) {
         this.status = status;
+
+        if (status == Status.CANCELED) {
+            this.bookOrders.forEach(BookOrder::returnBook);
+        }
     }
 
     public Boolean getPaid() {

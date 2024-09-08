@@ -97,12 +97,12 @@ public class PaymentController {
             );
         }
 
-        PaymentMethod defaultMethod = customer.getInvoiceSettings().getDefaultPaymentMethodObject();
+        String defaultMethod = customer.getInvoiceSettings().getDefaultPaymentMethod();
 
         return Map.of(
                 "list",
                 paymentMethods.stream().map(PaymentMethodDTO::fromPaymentMethod),
-                "default", defaultMethod != null ? defaultMethod.getId() : ""
+                "default", defaultMethod != null ? defaultMethod : ""
         );
     }
 }
