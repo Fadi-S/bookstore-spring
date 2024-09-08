@@ -30,7 +30,7 @@ build/
 !**/src/test/**/build/
 
 /src/main/resources/static
-/src/main/resources/secrect.properties
+/src/main/resources/secret.properties
 
 ### VS Code ###
 .vscode/
