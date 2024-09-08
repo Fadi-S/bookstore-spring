@@ -9,6 +9,7 @@ import dev.fadisarwat.bookstore.json.JsonResponse;
 import dev.fadisarwat.bookstore.models.OauthToken;
 import dev.fadisarwat.bookstore.models.User;
 import dev.fadisarwat.bookstore.services.OauthTokenService;
+import dev.fadisarwat.bookstore.services.PaymentService;
 import dev.fadisarwat.bookstore.services.UserService;
 import org.json.JSONObject;
 import org.springframework.beans.propertyeditors.StringTrimmerEditor;
@@ -23,10 +24,12 @@ public class AuthenticationController {
 
     private final OauthTokenService oauthTokenService;
     private final UserService userService;
+    private final PaymentService paymentService;
 
-    AuthenticationController(OauthTokenService oauthTokenService, UserService userService) {
+    AuthenticationController(OauthTokenService oauthTokenService, UserService userService, PaymentService paymentService) {
         this.oauthTokenService = oauthTokenService;
         this.userService = userService;
+        this.paymentService = paymentService;
     }
 
     @InitBinder
@@ -66,18 +69,12 @@ public class AuthenticationController {
     }
 
     @PostMapping("/register")
-    public Map<String, Object> register(@RequestBody User user) throws StripeException {
+    public Map<String, Object> register(@RequestBody User user) {
         if(this.userService.getUser(user.getEmail()) != null) {
             throw new EmailAlreadyExistsException("Email already exists");
         }
 
-        CustomerCreateParams params = CustomerCreateParams.builder()
-                .setName(user.getFullName())
-                .setEmail(user.getEmail())
-                .setMetadata(Map.of("user_id", user.getId().toString()))
-                .build();
-        Customer customer = Customer.create(params);
-        user.setStripeId(customer.getId());
+        user.setStripeId(paymentService.createCustomer(user));
         user = this.userService.saveUser(user);
 
         OauthToken token = this.oauthTokenService.createToken(user);

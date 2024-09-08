@@ -83,7 +83,7 @@ public class CartController {
     }
 
     @PostMapping("/cart/checkout")
-    public Object checkout(HttpServletResponse response, @RequestParam String addressId) {
+    public Object checkout(HttpServletResponse response, @RequestParam String addressId, @RequestParam String paymentMethod) {
         User user = this.userService.loadUserCart(User.getCurrentUser());
         Address address = this.addressService.getAddress(Long.parseLong(addressId));
 
@@ -112,8 +112,11 @@ public class CartController {
 
         Order order = this.orderService.checkout(user, address);
 
-        order.setPaid(paymentService.charge(user, order.getPriceInPennies()));
-        this.orderService.saveOrder(order);
+        Boolean charged = this.paymentService.charge(user, order.getPriceInPennies(), paymentMethod);
+        if (charged) {
+            order.setPaid(true);
+            this.orderService.saveOrder(order);
+        }
 
         return OrderDTO.fromOrder(order);
     }
