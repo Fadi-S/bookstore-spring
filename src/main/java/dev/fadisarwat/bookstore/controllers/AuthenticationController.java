@@ -1,10 +1,15 @@
 package dev.fadisarwat.bookstore.controllers;
 
+import com.stripe.exception.StripeException;
+import com.stripe.model.Customer;
+import com.stripe.param.CustomerCreateParams;
 import dev.fadisarwat.bookstore.exceptions.AuthenticationFailedException;
 import dev.fadisarwat.bookstore.exceptions.EmailAlreadyExistsException;
 import dev.fadisarwat.bookstore.json.JsonResponse;
+import dev.fadisarwat.bookstore.models.OauthToken;
 import dev.fadisarwat.bookstore.models.User;
 import dev.fadisarwat.bookstore.services.OauthTokenService;
+import dev.fadisarwat.bookstore.services.PaymentService;
 import dev.fadisarwat.bookstore.services.UserService;
 import org.json.JSONObject;
 import org.springframework.beans.propertyeditors.StringTrimmerEditor;
@@ -19,10 +24,12 @@ public class AuthenticationController {
 
     private final OauthTokenService oauthTokenService;
     private final UserService userService;
+    private final PaymentService paymentService;
 
-    AuthenticationController(OauthTokenService oauthTokenService, UserService userService) {
+    AuthenticationController(OauthTokenService oauthTokenService, UserService userService, PaymentService paymentService) {
         this.oauthTokenService = oauthTokenService;
         this.userService = userService;
+        this.paymentService = paymentService;
     }
 
     @InitBinder
@@ -67,8 +74,13 @@ public class AuthenticationController {
             throw new EmailAlreadyExistsException("Email already exists");
         }
 
+        user.setStripeId(paymentService.createCustomer(user));
+        user = this.userService.saveUser(user);
+
+        OauthToken token = this.oauthTokenService.createToken(user);
+
         return new JSONObject()
-                .put("token", this.oauthTokenService.createToken(user).getToken())
+                .put("token", token.getToken())
                 .put("user", user.get())
                 .put("authorities", user.getAuthoritiesString())
                 .toMap();
@@ -88,7 +100,7 @@ public class AuthenticationController {
     }
 
     @GetMapping("/user")
-    public Map<String, Object> getUser(@RequestHeader(value="Authorization") String authHeader) {
+    public Map<String, Object> getUser(@RequestHeader(value="Authorization") String authHeader) throws StripeException {
         JsonResponse response = new JsonResponse();
         String token = authHeader.substring(7);
         User user = User.getCurrentUser();

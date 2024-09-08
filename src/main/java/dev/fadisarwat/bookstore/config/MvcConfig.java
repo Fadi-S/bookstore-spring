@@ -1,6 +1,7 @@
 package dev.fadisarwat.bookstore.config;
 
 import com.mchange.v2.c3p0.ComboPooledDataSource;
+import com.stripe.Stripe;
 import dev.fadisarwat.bookstore.rules.UniqueConstraintValidator;
 import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.FactoryBean;
@@ -31,7 +32,11 @@ import java.util.logging.Logger;
 @PropertySource("classpath:persistence-mysql.properties")
 public class MvcConfig implements WebMvcConfigurer {
 
-    private Logger logger = Logger.getLogger(getClass().getName());
+    private final Logger logger = Logger.getLogger(getClass().getName());
+
+    MvcConfig(Environment env) {
+        Stripe.apiKey = env.getProperty("stripe.api");
+    }
 
     @Bean
     public DataSource getDataSource(Environment env) {

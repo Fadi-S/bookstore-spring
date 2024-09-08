@@ -13,6 +13,23 @@ public record AddressDTO(Long id, String fullName, String country, String street
     }
 
     public String getFullAddress() {
-        return postalCode() + " " + street1() + " " + street2() + ", " + city() + ", " + country();
+        StringBuilder fullAddress = new StringBuilder();
+        if (postalCode() != null)
+            fullAddress.append(postalCode())
+                    .append(" ");
+
+        fullAddress.append(street1())
+                .append(" ");
+
+        if (street2() != null)
+            fullAddress.append(street2());
+
+        fullAddress.append(", ")
+                .append(city())
+                .append(", ")
+                .append(country());
+        ;
+
+        return fullAddress.toString();
     }
 }

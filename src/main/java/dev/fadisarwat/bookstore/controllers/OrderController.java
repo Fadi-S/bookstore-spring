@@ -1,12 +1,11 @@
 package dev.fadisarwat.bookstore.controllers;
 
+import com.stripe.Stripe;
 import dev.fadisarwat.bookstore.dto.OrderDTO;
-import dev.fadisarwat.bookstore.models.Order;
 import dev.fadisarwat.bookstore.models.User;
 import dev.fadisarwat.bookstore.services.OrderService;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -15,8 +14,9 @@ import java.util.List;
 public class OrderController {
 
     private final OrderService orderService;
-    OrderController(OrderService orderService) {
+    OrderController(OrderService orderService, @Value("${stripe.api}") String stripeKey) {
         this.orderService = orderService;
+        Stripe.apiKey = stripeKey;
     }
 
     @GetMapping
