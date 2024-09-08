@@ -12,6 +12,7 @@ import dev.fadisarwat.bookstore.services.UserService;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -81,16 +82,26 @@ public class PaymentController {
     }
 
     @GetMapping("/methods")
-    public Map<String, Object> getPaymentMethods() throws StripeException {
+    public Map<String, Object> getPaymentMethods() {
         User user = User.getCurrentUser();
 
-        Customer customer = Customer.retrieve(user.getStripeId());
+        Customer customer;
+        List<PaymentMethod> paymentMethods;
+        try {
+            customer = Customer.retrieve(user.getStripeId());
+            paymentMethods = customer.listPaymentMethods().getData();
+        }catch (StripeException e) {
+            return Map.of(
+                    "list", List.of(),
+                    "default", ""
+            );
+        }
 
         PaymentMethod defaultMethod = customer.getInvoiceSettings().getDefaultPaymentMethodObject();
 
         return Map.of(
                 "list",
-                customer.listPaymentMethods().getData().stream().map(PaymentMethodDTO::fromPaymentMethod),
+                paymentMethods.stream().map(PaymentMethodDTO::fromPaymentMethod),
                 "default", defaultMethod != null ? defaultMethod.getId() : ""
         );
     }
