@@ -19,10 +19,10 @@ public class UserDAOImpl implements UserDAO {
     }
 
     @Override
-    public void saveUser(User user) {
+    public User saveUser(User user) {
         Session session = sessionFactory.getCurrentSession();
 
-        session.merge(user);
+        return session.merge(user);
     }
 
     @Override

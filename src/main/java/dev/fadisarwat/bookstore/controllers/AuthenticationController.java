@@ -1,8 +1,12 @@
 package dev.fadisarwat.bookstore.controllers;
 
+import com.stripe.exception.StripeException;
+import com.stripe.model.Customer;
+import com.stripe.param.CustomerCreateParams;
 import dev.fadisarwat.bookstore.exceptions.AuthenticationFailedException;
 import dev.fadisarwat.bookstore.exceptions.EmailAlreadyExistsException;
 import dev.fadisarwat.bookstore.json.JsonResponse;
+import dev.fadisarwat.bookstore.models.OauthToken;
 import dev.fadisarwat.bookstore.models.User;
 import dev.fadisarwat.bookstore.services.OauthTokenService;
 import dev.fadisarwat.bookstore.services.UserService;
@@ -62,13 +66,24 @@ public class AuthenticationController {
     }
 
     @PostMapping("/register")
-    public Map<String, Object> register(@RequestBody User user) {
+    public Map<String, Object> register(@RequestBody User user) throws StripeException {
         if(this.userService.getUser(user.getEmail()) != null) {
             throw new EmailAlreadyExistsException("Email already exists");
         }
 
+        CustomerCreateParams params = CustomerCreateParams.builder()
+                .setName(user.getFullName())
+                .setEmail(user.getEmail())
+                .setMetadata(Map.of("user_id", user.getId().toString()))
+                .build();
+        Customer customer = Customer.create(params);
+        user.setStripeId(customer.getId());
+        user = this.userService.saveUser(user);
+
+        OauthToken token = this.oauthTokenService.createToken(user);
+
         return new JSONObject()
-                .put("token", this.oauthTokenService.createToken(user).getToken())
+                .put("token", token.getToken())
                 .put("user", user.get())
                 .put("authorities", user.getAuthoritiesString())
                 .toMap();
@@ -88,7 +103,7 @@ public class AuthenticationController {
     }
 
     @GetMapping("/user")
-    public Map<String, Object> getUser(@RequestHeader(value="Authorization") String authHeader) {
+    public Map<String, Object> getUser(@RequestHeader(value="Authorization") String authHeader) throws StripeException {
         JsonResponse response = new JsonResponse();
         String token = authHeader.substring(7);
         User user = User.getCurrentUser();

@@ -1,14 +1,13 @@
 package dev.fadisarwat.bookstore.controllers;
 
 import dev.fadisarwat.bookstore.dto.BookForListDTO;
+import dev.fadisarwat.bookstore.dto.OrderDTO;
 import dev.fadisarwat.bookstore.dto.ShoppingCartItemDTO;
 import dev.fadisarwat.bookstore.models.Address;
 import dev.fadisarwat.bookstore.models.Book;
+import dev.fadisarwat.bookstore.models.Order;
 import dev.fadisarwat.bookstore.models.User;
-import dev.fadisarwat.bookstore.services.AddressService;
-import dev.fadisarwat.bookstore.services.BookService;
-import dev.fadisarwat.bookstore.services.OrderService;
-import dev.fadisarwat.bookstore.services.UserService;
+import dev.fadisarwat.bookstore.services.*;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.security.acls.model.NotFoundException;
 import org.springframework.web.bind.annotation.*;
@@ -25,11 +24,13 @@ public class CartController {
     private final BookService bookService;
     private final OrderService orderService;
     private final AddressService addressService;
-    CartController(UserService userService, BookService bookService, OrderService orderService, AddressService addressService) {
+    private final PaymentService paymentService;
+    CartController(UserService userService, BookService bookService, OrderService orderService, AddressService addressService, PaymentService paymentService) {
         this.userService = userService;
         this.bookService = bookService;
         this.orderService = orderService;
         this.addressService = addressService;
+        this.paymentService = paymentService;
     }
 
     @GetMapping("/cart")
@@ -82,7 +83,7 @@ public class CartController {
     }
 
     @PostMapping("/cart/checkout")
-    public Map<String, Object> checkout(HttpServletResponse response, @RequestParam String addressId) {
+    public Object checkout(HttpServletResponse response, @RequestParam String addressId) {
         User user = this.userService.loadUserCart(User.getCurrentUser());
         Address address = this.addressService.getAddress(Long.parseLong(addressId));
 
@@ -92,7 +93,7 @@ public class CartController {
 
         if (user.getBooksInCart().isEmpty()) {
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            return Map.of("message", "Cart is empty");
+            return Map.of("message", "Your cart is empty");
         }
 
         // check if the books are still in stock
@@ -109,8 +110,11 @@ public class CartController {
             return res;
         }
 
-        this.orderService.checkout(user, address);
+        Order order = this.orderService.checkout(user, address);
 
-        return Map.of("message", "success");
+        order.setPaid(paymentService.charge(user, order.getPriceInPennies()));
+        this.orderService.saveOrder(order);
+
+        return OrderDTO.fromOrder(order);
     }
 }

@@ -35,7 +35,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional
-    public void checkout(User user, Address address) {
+    public Order checkout(User user, Address address) {
         Order order = new Order(
                 user,
                 address,
@@ -56,7 +56,8 @@ public class OrderServiceImpl implements OrderService {
 
         bookDAO.saveBooks(booksToUpdate);
         userDAO.emptyCart(user);
-        orderDOA.saveOrder(order);
+
+        return orderDOA.saveOrder(order);
     }
 
     @Override
@@ -78,8 +79,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public Pagination<Order> getOrders(int page, int size)
-    {
+    public Pagination<Order> getOrders(int page, int size) {
         return orderDOA.getOrders(page, size);
     }
 

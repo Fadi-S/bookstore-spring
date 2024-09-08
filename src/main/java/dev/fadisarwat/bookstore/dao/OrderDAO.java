@@ -10,7 +10,7 @@ public interface OrderDAO {
     List<Order> getOrders();
     Pagination<Order> getOrders(int page, int size);
     List<Order> getOrders(User user);
-    void saveOrder(Order order);
+    Order saveOrder(Order order);
     Order getOrder(Long id);
     void deleteOrder(Long id);
 }

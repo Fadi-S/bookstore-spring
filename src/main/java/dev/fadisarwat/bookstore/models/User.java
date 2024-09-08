@@ -65,6 +65,9 @@ public class User {
     @Column
     private String picture;
 
+    @Column(name = "stripe_id")
+    private String stripeId;
+
     @ElementCollection
     @CollectionTable(name = "authorities", joinColumns = @JoinColumn(name = "user_id"))
     @Column(name = "authority")
@@ -265,4 +268,15 @@ public class User {
         this.setEmail(user.email());
     }
 
+    public String getStripeId() {
+        return stripeId;
+    }
+
+    public void setStripeId(String stripeId) {
+        this.stripeId = stripeId;
+    }
+
+    public String getFullName() {
+        return this.getFirstName() + " " + this.getLastName();
+    }
 }

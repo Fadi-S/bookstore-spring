@@ -14,5 +14,5 @@ public interface OrderService {
     void saveOrder(Order order);
     Order getOrder(Long id);
     void deleteOrder(Long id);
-    void checkout(User user, Address address);
+    Order checkout(User user, Address address);
 }

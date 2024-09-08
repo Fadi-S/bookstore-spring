@@ -10,13 +10,15 @@ import java.util.List;
 public class OrderDTO {
 
     private final Long priceInPennies;
+    private final Long id;
     private final String status;
     private final List<BookForListDTO> books;
     private final Date createdAt;
     private final Boolean isPaid;
     private final String number;
 
-    public OrderDTO(Long priceInPennies, String status, Date createdAt, Boolean isPaid, List<BookOrder> bookOrders, String number) {
+    public OrderDTO(Long id, Long priceInPennies, String status, Date createdAt, Boolean isPaid, List<BookOrder> bookOrders, String number) {
+        this.id = id;
         this.priceInPennies = priceInPennies;
         this.createdAt = createdAt;
         this.status = status;
@@ -33,6 +35,7 @@ public class OrderDTO {
 
     public static OrderDTO fromOrder(Order order) {
         return new OrderDTO(
+                order.getId(),
                 order.getPriceInPennies(),
                 order.getStatus().getDescription(),
                 order.getCreatedAt(),
@@ -65,5 +68,9 @@ public class OrderDTO {
 
     public String getNumber() {
         return number;
+    }
+
+    public Long getId() {
+        return id;
     }
 }

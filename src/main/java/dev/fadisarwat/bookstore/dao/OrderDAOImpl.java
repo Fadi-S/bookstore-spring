@@ -21,10 +21,10 @@ public class OrderDAOImpl implements OrderDAO {
     }
 
     @Override
-    public void saveOrder(Order order) {
+    public Order saveOrder(Order order) {
         Session session = sessionFactory.getCurrentSession();
 
-        session.merge(order);
+        return session.merge(order);
     }
 
     @Override
