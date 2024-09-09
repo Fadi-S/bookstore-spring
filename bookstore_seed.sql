@@ -21,4 +21,4 @@ INSERT INTO `oauth_token` (`user_id`, `token`) VALUES
 
 
 INSERT INTO `user` (`id`, `first_name`, `last_name`, `email`, `password`, `picture`, `stripe_id`) VALUES
-(1, 'Administrator', '', 'admin@fadisarwat.dev', '$2a$12$5zXjhD11ft8deacmnh3YY.7tPqIsL3np9PQWqP2nWb05Z1e5Egx2u', NULL, NULL);
+(1, 'Administrator', '1', 'admin@fadisarwat.dev', '$2a$12$5zXjhD11ft8deacmnh3YY.7tPqIsL3np9PQWqP2nWb05Z1e5Egx2u', NULL, NULL);
