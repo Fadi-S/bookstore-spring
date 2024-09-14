@@ -20,11 +20,11 @@ cp src/main/resources/copy.secret.properties src/main/resources/secret.propertie
 ```
 4. Set up the database credentials in `persistence-mysql.properties` file.
 5. Create a database in MySQL using database_structure.sql
-6. (Optional) Seed the database with some data using `database_data.sql` file.
-7. (Optional) if you used the `database_data.sql` file, you can use the following credentials to login as Admin:
+6. (Optional) Seed the database with some data using `database_seed.sql` file.
+7. (Optional) if you used the `database_seed.sql` file, you can use the following credentials to login as Admin:
     - Email: `admin@fadisarwat.dev`
     - Password: `admin`
-8. (Optional) id you used the `database_data.sql` file, you must copy the images in `books` to `src/main/resources/static/books` to have the images displayed correctly.
+8. (Optional) id you used the `database_seed.sql` file, you must copy the images in `books` to `src/main/resources/static/books` to have the images displayed correctly.
 7. Install the project dependencies from the `pom.xml` file:
 8. Start the development server by running BookstoreApplication.main()
 9. Test endpoints using Postman or any other API testing tool.
