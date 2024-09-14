@@ -74,8 +74,8 @@ public class AuthenticationController {
             throw new EmailAlreadyExistsException("Email already exists");
         }
 
-        user.setStripeId(paymentService.createCustomer(user));
         user = this.userService.saveUser(user);
+        user.setStripeId(paymentService.createCustomer(user));
 
         OauthToken token = this.oauthTokenService.createToken(user);
 
