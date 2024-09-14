@@ -83,12 +83,17 @@ public class Filter {
 
             query = field + " " + type.sign + " (" + in + ")";
         }else if (type == Type.FULL_TEXT) {
-            query = "MATCH(" + field + ") AGAINST ('" + escapeWildcardsForMySQL(value) + "' IN BOOLEAN MODE)";
+            query = "match(" + field + ") against ('" + escapeWildcardsForMySQL(value) + "' in boolean mode)";
         }else {
             query = field + " " + type.sign + " :" + field;
         }
 
-        return query + (orFilter != null ? " OR " + orFilter.getQuery() : "");
+        if(orFilter != null) {
+            query += " or " + orFilter.getQuery();
+            query = "(" + query + ")";
+        }
+
+        return query;
     }
 
     private String escapeStringForMySQL(String s) {
