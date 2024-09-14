@@ -1,3 +1,7 @@
+INSERT INTO `user` (`id`, `first_name`, `last_name`, `email`, `password`, `picture`, `stripe_id`) VALUES
+    (1, 'Administrator', '1', 'admin@fadisarwat.dev', '$2a$12$5zXjhD11ft8deacmnh3YY.7tPqIsL3np9PQWqP2nWb05Z1e5Egx2u', NULL, NULL);
+
+
 INSERT INTO `authorities` (`id`, `user_id`, `authority`) VALUES
 (1, 1, 'ADMIN');
 
@@ -18,7 +22,3 @@ INSERT INTO `book` (`id`, `title`, `author`, `genre`, `price_in_pennies`, `quant
 
 INSERT INTO `oauth_token` (`user_id`, `token`) VALUES
 (1, 'Nd8og1aPspFfdbkc8rp2gNboq8inA60sSsahs6AhyoXJeTuXunT5ER5Ysyjlmuy7');
-
-
-INSERT INTO `user` (`id`, `first_name`, `last_name`, `email`, `password`, `picture`, `stripe_id`) VALUES
-(1, 'Administrator', '1', 'admin@fadisarwat.dev', '$2a$12$5zXjhD11ft8deacmnh3YY.7tPqIsL3np9PQWqP2nWb05Z1e5Egx2u', NULL, NULL);
