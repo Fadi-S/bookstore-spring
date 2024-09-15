@@ -93,7 +93,7 @@ public class MvcConfig implements WebMvcConfigurer {
         factoryBean.setPackagesToScan("dev.fadisarwat.bookstore.models");
 
         Properties props = new Properties();
-        props.setProperty("hibernate.show_sql", "true");
+        props.setProperty("hibernate.show_sql", environment.getProperty("hibernate.show_sql", "false"));
         factoryBean.setHibernateProperties(props);
 
         return factoryBean;
