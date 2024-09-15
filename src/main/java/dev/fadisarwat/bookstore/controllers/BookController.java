@@ -6,6 +6,7 @@ import dev.fadisarwat.bookstore.helpers.Sort;
 import dev.fadisarwat.bookstore.models.Book;
 import dev.fadisarwat.bookstore.dto.BookForListDTO;
 import dev.fadisarwat.bookstore.models.User;
+import dev.fadisarwat.bookstore.services.BookRecommendationService;
 import dev.fadisarwat.bookstore.services.BookService;
 import dev.fadisarwat.bookstore.services.ImageService;
 import dev.fadisarwat.bookstore.services.ReviewService;
@@ -29,6 +30,7 @@ public class BookController {
     private final BookService bookService;
     private final ImageService imageService;
     private final ReviewService reviewService;
+    private final BookRecommendationService bookRecommendationService;
 
     @InitBinder
     public void initBinder(WebDataBinder binder) {
@@ -37,10 +39,11 @@ public class BookController {
         binder.registerCustomEditor(String.class, editor);
     }
 
-    public BookController(BookService bookService, ImageService imageService, ReviewService reviewService) {
+    public BookController(BookService bookService, ImageService imageService, ReviewService reviewService, BookRecommendationService bookRecommendationService) {
         this.bookService = bookService;
         this.imageService = imageService;
         this.reviewService = reviewService;
+        this.bookRecommendationService = bookRecommendationService;
     }
 
     private Integer parseInteger(String value, Integer defaultValue) {
@@ -103,11 +106,13 @@ public class BookController {
         List<String> genres = bookService.allGenres();
         List<String> authors = bookService.allAuthors();
         Pagination<BookForListDTO> books = this.bookService.getBooks(filters, sort, page, size);
+        List<BookForListDTO> recommendedBooks = bookRecommendationService.recommendedBooks(User.getCurrentUser());
 
         return Map.of(
                 "books", books,
                 "genres", genres,
-                "authors", authors
+                "authors", authors,
+                "recommendedBooks", recommendedBooks
         );
     }
 
@@ -143,6 +148,8 @@ public class BookController {
                 );
             }
         }
+
+        bookRecommendationService.saveBrowseHistory(book, user);
 
         return book;
     }

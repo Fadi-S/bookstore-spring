@@ -5,6 +5,7 @@ import dev.fadisarwat.bookstore.helpers.Pagination;
 import dev.fadisarwat.bookstore.helpers.Sort;
 import dev.fadisarwat.bookstore.models.Book;
 import dev.fadisarwat.bookstore.dto.BookForListDTO;
+import dev.fadisarwat.bookstore.models.User;
 
 import java.util.List;
 

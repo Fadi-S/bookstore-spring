@@ -4,6 +4,7 @@ import dev.fadisarwat.bookstore.helpers.Filter;
 import dev.fadisarwat.bookstore.helpers.Pagination;
 import dev.fadisarwat.bookstore.helpers.Sort;
 import dev.fadisarwat.bookstore.models.Book;
+import dev.fadisarwat.bookstore.models.User;
 
 import java.util.List;
 import java.util.Optional;
