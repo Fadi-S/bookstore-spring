@@ -54,7 +54,7 @@ public class OauthTokenDAOImpl implements OauthTokenDAO {
     public List<String> getAuthorities(OauthToken oauthToken) {
         Session session = sessionFactory.getCurrentSession();
 
-        Query query = session.createNativeQuery("select authority from authorities where user_id=:id");
+        Query<String> query = session.createNativeQuery("select authority from authorities where user_id=:id", String.class);
 
         query.setParameter("id", oauthToken.getUser().getId());
 
