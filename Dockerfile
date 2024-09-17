@@ -13,6 +13,8 @@ COPY . .
 # Build the Maven project
 RUN mvn clean package -DskipTests
 
+RUN ls -l target
+
 # Copy the built jar file to a dedicated location
 COPY target/*.jar app.jar
 
