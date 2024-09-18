@@ -14,7 +14,10 @@ COPY . .
 RUN mvn clean package -DskipTests
 
 # Copy the built jar file to a dedicated location
-RUN cp target/*.jar app.jar
+RUN cp target/*.jar /app/app.jar
+
+# Ensure the JAR file has correct permissions
+RUN chmod +x /app/app.jar
 
 # Command to run the application
-ENTRYPOINT ["java", "-jar", "/app.jar"]
+ENTRYPOINT ["java", "-jar", "/app/app.jar"]
