@@ -100,7 +100,7 @@ public class BookDAOImpl implements BookDAO {
                 .filter(filter -> fields.contains(filter.getField()))
                 .toList();
 
-        StringBuilder queryString = new StringBuilder("Select b.*, count(bo.id) as popularity from Book b left join book_order bo on b.id=bo.book_id");
+        StringBuilder queryString = new StringBuilder("Select b.*, count(bo.id) as popularity from book b left join book_order bo on b.id=bo.book_id");
 
         StringBuilder filterString = new StringBuilder();
         if (!filters.isEmpty()) {
