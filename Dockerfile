@@ -20,4 +20,4 @@ RUN cp target/*.jar /app/app.jar
 RUN chmod +x /app/app.jar
 
 # Command to run the application
-ENTRYPOINT ["java", "-jar", "/app/app.jar"]
+ENTRYPOINT ["java", "-jar", "/app/app.jar", "--server.port=80"]
