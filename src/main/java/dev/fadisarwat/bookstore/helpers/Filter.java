@@ -83,7 +83,7 @@ public class Filter {
 
             query = field + " " + type.sign + " (" + in + ")";
         }else if (type == Type.FULL_TEXT) {
-            query = "match(" + field + ") against (:" + field + " in boolean mode)";
+            query = "match(" + field + ") against (:" + field + " in natural language mode)";
         }else {
             query = field + " " + type.sign + " :" + field;
         }
