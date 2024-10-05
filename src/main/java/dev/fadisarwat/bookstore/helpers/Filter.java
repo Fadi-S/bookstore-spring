@@ -83,7 +83,7 @@ public class Filter {
 
             query = field + " " + type.sign + " (" + in + ")";
         }else if (type == Type.FULL_TEXT) {
-            query = "match(" + field + ") against ('" + escapeWildcardsForMySQL(value) + "' in boolean mode)";
+            query = "match(" + field + ") against (:" + field + " in boolean mode)";
         }else {
             query = field + " " + type.sign + " :" + field;
         }
@@ -96,31 +96,10 @@ public class Filter {
         return query;
     }
 
-    private String escapeStringForMySQL(String s) {
-        return s.replaceAll("\\\\", "\\\\\\\\")
-                .replaceAll("\b","\\b")
-                .replaceAll("\n","\\n")
-                .replaceAll("\r", "\\r")
-                .replaceAll("\t", "\\t")
-                .replaceAll("\\x1A", "\\Z")
-                .replaceAll("\\x00", "\\0")
-                .replaceAll("'", "\\'")
-                .replaceAll("\"", "\\\"");
-    }
-
-    private String escapeWildcardsForMySQL(String s) {
-        return escapeStringForMySQL(s)
-                .replaceAll("%", "\\%")
-                .replaceAll("_","\\_");
-    }
-
-
     public Map<String, String> getParameters() {
         Map<String, String> values = new HashMap<>();
 
-        if(type == Type.FULL_TEXT) {
-            values = new HashMap<>();
-        }else if(type == Type.IN) {
+        if(type == Type.IN) {
             String[] split = value.split(",");
             for (int i = 0; i < split.length; i++) {
                 values.put(field + i, split[i]);
@@ -132,5 +111,9 @@ public class Filter {
         values.putAll(orFilter != null ? orFilter.getParameters() : Map.of());
 
         return values;
+    }
+
+    public Type getType() {
+        return type;
     }
 }
